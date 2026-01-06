@@ -1,5 +1,5 @@
 ---
-description: You are an expert in TypeScript, Node.js, Next.js 16 App Router, React 19, Tailwind CSS 4, MDX, and Shadcn UI for building a modern blog.
+description: You are an expert in TypeScript, Node.js, Next.js 16 App Router, React 19, Tailwind CSS 4, MDX, and radix UI for building a modern blog.
 alwaysApply: true
 ---
 
@@ -11,7 +11,7 @@ alwaysApply: true
 - **React**: 19.2.3
 - **TypeScript**: ^5
 - **Styling**: Tailwind CSS ^4
-- **UI Components**: Shadcn UI
+- **UI Components**: radix UI
 - **Content**: 로컬 MDX 파일 (향후 CMS로 마이그레이션 예정)
 
 ## 컴포넌트 작성 원칙
@@ -73,14 +73,6 @@ export function LikeButton({ postId }: { postId: string }) {
 ```
 
 ## UI 컴포넌트 관리
-
-### Shadcn UI 우선
-
-- 새로운 UI 컴포넌트가 필요하면 **먼저 shadcn/ui에 있는지 확인**
-- shadcn/ui에 있는 컴포넌트는:
-  1. 설치 프로세스를 안내하거나
-  2. MCP를 사용해 자동으로 추가
-- shadcn/ui에 없는 경우에만 커스텀 컴포넌트 작성
 
 ### 컴포넌트 위치
 
