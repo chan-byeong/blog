@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
@@ -19,8 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <body className={`${suit.variable} antialiased`}>{children}</body>
+    <html lang='ko' suppressHydrationWarning>
+      <body className={`${suit.variable} antialiased`}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
