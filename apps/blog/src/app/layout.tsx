@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import { Inter } from 'next/font/google';
+import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
 import { ThemeProvider } from '../components/theme-provider';
 
@@ -7,6 +9,12 @@ const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
   display: 'swap',
   variable: '--font-suit',
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
 });
 
 export const metadata: Metadata = {
@@ -21,8 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ko' suppressHydrationWarning>
-      <body className={`${suit.variable} antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body
+        className={`${suit.variable} ${inter.variable} font-suit antialiased bg-background`}
+      >
+        <main>
+          <ThemeProvider>{children}</ThemeProvider>
+        </main>
       </body>
     </html>
   );
