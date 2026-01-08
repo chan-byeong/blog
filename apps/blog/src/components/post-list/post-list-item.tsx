@@ -15,15 +15,15 @@ export const PostListItem = () => {
       >
         {/* 날짜 */}
 
-        <span className='col-start-1 col-span-3 text-md font-semibold text-primary'>
+        <span className='col-start-1 col-span-3 text-sm font-semibold text-primary'>
           2026-01-07
         </span>
         {/* 제목 */}
-        <span className='col-start-4 col-span-13 text-md font-semibold text-primary'>
+        <span className='col-start-4 col-span-13 text-md font-bold text-primary'>
           Next.js 16.1.1의 새로운 기능
         </span>
         {/* 태그 */}
-        <span className='col-start-17 col-span-3 text-md font-semibold text-primary truncate'>
+        <span className='col-start-17 col-span-3 text-sm font-semibold text-primary truncate'>
           #Next.js #React #TypeScript
         </span>
       </Link>
