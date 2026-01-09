@@ -35,15 +35,17 @@ const AccordionTrigger = ({
   ...props
 }: AccordionTriggerProps) => {
   return (
-    <RadixAccordion.Trigger
-      className={cn(
-        'flex items-center gap-2 group w-full text-left',
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </RadixAccordion.Trigger>
+    <RadixAccordion.Header>
+      <RadixAccordion.Trigger
+        className={cn(
+          'flex items-center gap-2 group w-full text-left',
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </RadixAccordion.Trigger>
+    </RadixAccordion.Header>
   );
 };
 
