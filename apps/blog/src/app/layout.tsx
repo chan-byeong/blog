@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
 import { ThemeProvider } from '../components/theme-provider';
+import { NavBar } from '@/components/ui/nav-bar';
 
 const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
@@ -30,10 +31,13 @@ export default function RootLayout({
   return (
     <html lang='ko' suppressHydrationWarning>
       <body
-        className={`${suit.variable} ${inter.variable} font-suit antialiased bg-background`}
+        className={`${suit.variable} ${inter.variable} font-suit antialiased bg-background selection:bg-accent`}
       >
-        <main>
-          <ThemeProvider>{children}</ThemeProvider>
+        <main className='grid items-start w-full max-w-7xl mx-auto min-h-dvh auto-rows-auto grid-flow-row px-6 gap-0 grid-cols-8 md:grid-cols-[repeat(24,1fr)] sm:grid-cols-[repeat(16,1fr)]'>
+          <ThemeProvider>
+            <NavBar />
+            {children}
+          </ThemeProvider>
         </main>
       </body>
     </html>
