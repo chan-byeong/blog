@@ -1,34 +1,31 @@
 'use client';
 
 import Link from 'next/link';
+import { Post } from '@/types/post';
 
-// interface PostListItemProps {
-//   // post: Post;
-// }
+interface PostListItemProps {
+  post: Post;
+}
 
 import { Tag } from '../ui/tag';
 
-export const PostListItem = () => {
+export const PostListItem = ({ post }: PostListItemProps) => {
   return (
     <li className='grid grid-cols-subgrid col-span-full items-center border-b-[0.5px] border-border'>
       <Link
-        href='/posts/1'
+        href={`/posts/${post.slug}`}
         className='grid grid-cols-subgrid col-span-full items-center py-2.5 px-1 self-start hover:bg-accent'
       >
-        {/* 날짜 */}
-
         <span className='col-start-1 col-span-3 text-sm font-semibold text-primary'>
-          2026-01-07
+          {post.date}
         </span>
-        {/* 제목 */}
         <span className='col-start-4 col-span-13 text-md font-bold text-primary'>
-          Next.js 16.1.1의 새로운 기능
+          {post.title}
         </span>
-        {/* 태그 */}
         <span className='col-start-17 col-span-3 text-sm font-semibold text-primary truncate'>
-          <Tag label='#Next.js' />
-          <Tag label='#React' />
-          <Tag label='#TypeScript' />
+          {post.tags?.map((tag) => (
+            <Tag key={tag} label={`# ${tag}`} />
+          ))}
         </span>
       </Link>
     </li>

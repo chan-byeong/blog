@@ -1,10 +1,15 @@
+'use client';
+import { usePostStore } from '@/providers/post-provider';
 import { PostListItem } from './post-list-item';
+import { useShallow } from 'zustand/react/shallow';
 
 export const PostList = () => {
-  // store get posts
+  const posts = usePostStore(useShallow((store) => store.getFilteredPosts()));
   return (
     <ul className='grid grid-cols-subgrid col-span-full'>
-      <PostListItem />
+      {posts.map((post) => (
+        <PostListItem key={post.slug} post={post} />
+      ))}
     </ul>
   );
 };
