@@ -20,45 +20,43 @@ export type PostActions = {
 
 export type PostStore = PostState & PostActions;
 
-export const initialState: PostState = {
-  posts: [],
-  selectedTags: [],
-  postCount: 0,
-  postCountByTags: {},
-};
-
-const createPostSlice: StateCreator<PostStore, []> = (set, get) => ({
-  ...initialState,
-  getAllPosts: () => {
-    return get().posts;
-  },
-  getPostsByTags: (tags: string[]) => {
-    return get().posts.filter((post) =>
-      post.tags?.some((tag) => tags.includes(tag))
-    );
-  },
-  getFilteredPosts: () => {
-    const selectedTags = get().selectedTags;
-    if (selectedTags.length === 0) {
+const createPostSlice: StateCreator<PostStore, [], [], PostStore> = (
+  set,
+  get
+) =>
+  ({
+    getAllPosts: () => {
       return get().posts;
-    }
-    return get().posts.filter((post) =>
-      post.tags?.some((tag) => selectedTags.includes(tag))
-    );
-  },
-  getAllTags: () => {
-    return Array.from(new Set(get().posts.flatMap((post) => post.tags || [])));
-  },
-  addSelectedTag: (tag: string) => {
-    set({ selectedTags: Array.from(new Set([...get().selectedTags, tag])) });
-  },
-  removeSelectedTag: (tag: string) => {
-    set({ selectedTags: get().selectedTags.filter((t) => t !== tag) });
-  },
-  getSelectedTags: () => {
-    return get().selectedTags;
-  },
-});
+    },
+    getPostsByTags: (tags: string[]) => {
+      return get().posts.filter((post) =>
+        post.tags?.some((tag) => tags.includes(tag))
+      );
+    },
+    getFilteredPosts: () => {
+      const selectedTags = get().selectedTags;
+      if (selectedTags.length === 0) {
+        return get().posts;
+      }
+      return get().posts.filter((post) =>
+        post.tags?.some((tag) => selectedTags.includes(tag))
+      );
+    },
+    getAllTags: () => {
+      return Array.from(
+        new Set(get().posts.flatMap((post) => post.tags || []))
+      );
+    },
+    addSelectedTag: (tag: string) => {
+      set({ selectedTags: Array.from(new Set([...get().selectedTags, tag])) });
+    },
+    removeSelectedTag: (tag: string) => {
+      set({ selectedTags: get().selectedTags.filter((t) => t !== tag) });
+    },
+    getSelectedTags: () => {
+      return get().selectedTags;
+    },
+  } as PostStore);
 
 export const createPostStore = (initialState: PostState) => {
   return createStore<PostStore>()((set, get, store) => ({
