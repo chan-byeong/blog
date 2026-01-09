@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className='mx-auto max-w-4xl px-6 py-24 text-center'>
+    <div className='col-span-full flex flex-col items-center justify-center min-h-[80vh] mx-auto max-w-4xl px-6 text-center'>
       <h1 className='mb-4 text-4xl font-semibold tracking-tight'>
         Post Not Found
       </h1>
@@ -11,11 +11,10 @@ export default function NotFound() {
       </p>
       <Link
         href='/'
-        className='inline-block rounded-full bg-foreground px-6 py-3 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]'
+        className='inline-block bg-foreground px-5 py-3 text-background transition-colors hover:bg-foreground/30 hover:text-primary/80'
       >
         홈으로 돌아가기
       </Link>
     </div>
   );
 }
-
