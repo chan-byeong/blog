@@ -39,10 +39,10 @@ export const FilterItem = ({
         onCheckedChange={handleCheckedChange}
         {...props}
       />
-      <span className='text-sm font-medium text-primary/80 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold hover:font-semibold hover:text-foreground'>
+      <span className='text-sm font-medium text-primary/80 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold group-hover:font-semibold group-hover:text-foreground'>
         {label}
       </span>
-      <span className='text-xs font-medium text-primary/60 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold hover:font-semibold hover:text-foreground'>
+      <span className='text-xs font-medium text-primary/60 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold group-hover:font-semibold group-hover:text-foreground'>
         ({postsCount})
       </span>
     </div>
