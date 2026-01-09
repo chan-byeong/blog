@@ -1,6 +1,25 @@
-export const TriggerButton = ({ children }: { children: React.ReactNode }) => {
+import { cn } from '@/lib/utils';
+interface TriggerButtonProps extends React.ComponentPropsWithRef<'button'> {
+  children: React.ReactNode;
+  className?: string;
+  ref?: React.RefObject<HTMLButtonElement>;
+}
+
+export const TriggerButton = ({
+  children,
+  className,
+  ref = undefined,
+  ...props
+}: TriggerButtonProps) => {
   return (
-    <button className='cursor-pointer hover:bg-muted-foreground/20 transition-colors rounded-sm p-1'>
+    <button
+      ref={ref}
+      className={cn(
+        'cursor-pointer hover:bg-muted-foreground/20 transition-colors rounded-sm p-1',
+        className
+      )}
+      {...props}
+    >
       <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
 
       <div>
