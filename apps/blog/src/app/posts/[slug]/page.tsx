@@ -1,6 +1,11 @@
 import { notFound } from 'next/navigation';
 import { getPostBySlug, getAllPostSlugs } from '../../../lib/posts';
+import { parseMDX, extractTOC } from '../../../lib/mdx';
+import { PostHeader } from '../../../components/post/post-header';
+import { PostContent } from '../../../components/post/post-content';
 import type { Metadata } from 'next';
+import { PostSideBar } from '@/components/post/post-side-bar';
+import { TableHeader } from '@/components/ui/table-header';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -52,40 +57,49 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound();
   }
 
+  // MDX 파싱
+  const { content } = await parseMDX(post.content);
+
+  // TOC 추출
+  const tocItems = extractTOC(post.content);
+
   return (
-    <article className='mx-auto max-w-4xl px-6 py-24'>
-      <header className='mb-12'>
-        <h1 className='mb-4 text-4xl font-semibold tracking-tight text-foreground'>
-          {post.title}
-        </h1>
-        <div className='flex flex-wrap items-center gap-4 text-sm text-muted-foreground'>
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-          {post.tags && post.tags.length > 0 && (
-            <div className='flex flex-wrap gap-2'>
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className='rounded-full bg-muted px-3 py-1 text-xs font-medium'
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
+    <div className='grid grid-cols-subgrid col-span-full mt-20'>
+      <section className='grid grid-cols-subgrid col-span-full'>
+        <PostHeader
+          title={post.title}
+          description={post.description}
+          date={post.date}
+          tags={post.tags || []}
+        />
+      </section>
+      <section className='grid grid-cols-subgrid col-span-full mt-16'>
+        <div className='sticky top-24 grid grid-cols-subgrid col-start-1 col-span-6 self-start'>
+          {/* 목차 (TOC) - 큰 화면에서만 표시 */}
+          {tocItems.length > 0 && (
+            <PostSideBar
+              tocItems={tocItems}
+              title={post.title}
+              description={post.description}
+              date={post.date}
+              tags={post.tags || []}
+            />
           )}
         </div>
-      </header>
-
-      <div className='prose prose-lg dark:prose-invert max-w-none'>
-        {/* MDX 컨텐츠는 여기에 렌더링됩니다 */}
-        {/* 향후 MDX 컴포넌트로 교체 예정 */}
-        <div className='whitespace-pre-wrap'>{post.content}</div>
-      </div>
-    </article>
+        {/* 메인 컨텐츠 그리드 */}
+        <div className='grid grid-cols-subgrid col-start-7 col-span-18 px-6'>
+          <div className='grid-cols-subgrid col-span-full items-start'>
+            <TableHeader className='col-span-full'>
+              <span className='col-span-full text-primary text-sm font-semibold uppercase'>
+                / Contents
+              </span>
+            </TableHeader>
+            <article className='grid grid-cols-subgrid col-span-full items-start'>
+              <PostContent>{content}</PostContent>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }
