@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
 import { ThemeProvider } from '../components/theme-provider';
@@ -45,6 +46,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </main>
+        <Analytics />
       </body>
     </html>
   );
