@@ -1,6 +1,6 @@
 export const TriggerButton = ({ children }: { children: React.ReactNode }) => {
   return (
-    <button>
+    <button className='cursor-pointer hover:bg-muted-foreground/20 transition-colors rounded-sm p-1'>
       <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
 
       <div>

@@ -30,18 +30,19 @@ export const FilterItem = ({
 
   return (
     <div
-      className='flex items-center gap-2 group'
+      className='flex items-center gap-2 group cursor-pointer'
       data-state={checkState ? 'checked' : 'unchecked'}
+      onClick={() => handleCheckedChange(!checkState)}
     >
       <Checkbox
         checked={checkState}
         onCheckedChange={handleCheckedChange}
         {...props}
       />
-      <span className='text-sm font-medium text-primary/80 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold'>
+      <span className='text-sm font-medium text-primary/80 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold hover:font-semibold hover:text-foreground'>
         {label}
       </span>
-      <span className='text-xs font-medium text-primary/60 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold'>
+      <span className='text-xs font-medium text-primary/60 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold hover:font-semibold hover:text-foreground'>
         ({postsCount})
       </span>
     </div>
