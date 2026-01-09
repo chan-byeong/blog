@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { NavButton } from './nav-button';
+import { useTheme } from 'next-themes';
 
 const navItems = [
   { label: 'BLOG', href: '/', key: 'B' },
@@ -13,6 +14,7 @@ const navItems = [
 
 export const NavBar = () => {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
 
   return (
     <nav className='fixed top-0 left-1/2 -translate-x-1/2 z-50 flex w-full items-center justify-between bg-background/80 px-8 py-2 backdrop-blur-md'>
@@ -44,8 +46,15 @@ export const NavBar = () => {
         </NavigationMenu.Root>
       </div>
 
-      {/* 우측 콘솔 버튼 */}
-      <NavButton label='CONSOLE' shortcutKey='C' active={false} />
+      <NavButton
+        label={theme === 'dark' ? 'LIGHT' : 'DARK'}
+        shortcutKey={theme === 'dark' ? 'L' : 'D'}
+        active={false}
+        onClick={() => {
+          setTheme(theme === 'dark' ? 'light' : 'dark');
+        }}
+        aria-label='theme toggle'
+      />
     </nav>
   );
 };
