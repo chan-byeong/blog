@@ -22,6 +22,7 @@ export const PostSideBar = ({
   tags,
 }: PostSideBarProps) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [isTocVisible, setIsTocVisible] = useState(true);
 
   useEffect(() => {
     // 원본 PostHeader 요소를 찾기
@@ -51,10 +52,14 @@ export const PostSideBar = ({
     };
   }, []);
 
+  const handleToggleToc = () => {
+    setIsTocVisible((prev) => !prev);
+  };
+
   return (
-    <div className='grid grid-cols-subgrid col-start-1 col-span-6'>
+    <div className='grid grid-cols-subgrid col-span-full'>
       <div
-        className={`grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`hidden md:block grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
           isScrolledDown
             ? 'max-h-[500px] opacity-100 translate-y-0'
             : 'max-h-0 opacity-0 -translate-y-4'
@@ -68,12 +73,34 @@ export const PostSideBar = ({
           isScrollDown={true}
         />
       </div>
-      <TableHeader className='col-span-full'>
-        <span className='col-span-full text-primary text-sm font-semibold uppercase'>
-          / Table of Contents
+
+      <TableHeader className='hidden md:grid col-span-full'>
+        <span className='col-span-full text-primary text-xs font-semibold uppercase'>
+          / Side
         </span>
       </TableHeader>
-      <TableOfContents items={tocItems} />
+
+      <button
+        className='col-span-full cursor-pointer text-[15px] font-medium inline-flex self-start group items-center gap-x-2 hover:bg-muted-foreground/20 transition-colors my-2 mr-4 py-1 rounded-xs data-[state=closed]:text-primary/80'
+        onClick={handleToggleToc}
+        data-state={isTocVisible ? 'open' : 'closed'}
+        aria-expanded={isTocVisible}
+        aria-controls='toc-content'
+      >
+        <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
+        Table of Contents
+      </button>
+
+      <div
+        id='toc-content'
+        className={`grid grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
+          isTocVisible
+            ? 'max-h-[1000px] opacity-100 translate-y-0'
+            : 'max-h-0 opacity-0 -translate-y-4'
+        }`}
+      >
+        <TableOfContents items={tocItems} />
+      </div>
     </div>
   );
 };

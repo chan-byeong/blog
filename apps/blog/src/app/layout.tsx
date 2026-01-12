@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
-import { ThemeProvider } from '../components/theme-provider';
+import { ThemeProvider } from '../providers/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
 import { Footer } from '@/components/footer';
 
@@ -41,7 +41,7 @@ export default function RootLayout({
       <body
         className={`${suit.variable} ${inter.variable} font-suit antialiased bg-background selection:bg-accent`}
       >
-        <main className='grid items-start w-full max-w-7xl mx-auto min-h-dvh auto-rows-auto grid-flow-row px-6 gap-0 grid-cols-8 md:grid-cols-[repeat(24,1fr)] sm:grid-cols-[repeat(16,1fr)]'>
+        <main className='grid items-start w-full max-w-7xl mx-auto min-h-dvh auto-rows-auto grid-flow-row px-2 md:px-6 gap-0 grid-cols-8 md:grid-cols-[repeat(24,1fr)] sm:grid-cols-[repeat(16,1fr)]'>
           <ThemeProvider>
             <NavBar />
             {children}

@@ -54,9 +54,9 @@ export function TableOfContents({ items }: TableOfContentsProps) {
   };
 
   return (
-    <nav className='hidden md:block col-span-full self-start mt-4'>
+    <nav className='block col-span-full self-start mt-2'>
       <div className='space-y-2'>
-        <ul className='space-y-2 border-l border-dotted border-border'>
+        <ul className='space-y-2 border-l border-dotted border-border/50 ml-2 mb-2'>
           {items.map((item) => {
             const isActive = activeId === item.id;
             const paddingLeft = (item.level - 1) * 12 + 16;

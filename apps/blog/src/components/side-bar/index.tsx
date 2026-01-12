@@ -13,7 +13,7 @@ export const SideBar = () => {
     }))
   );
   return (
-    <div className='sticky top-20 grid grid-cols-subgrid grid-rows-subgrid col-span-5 row-span-2 gap-y-14 self-start'>
+    <div className='sticky top-20 grid grid-cols-subgrid grid-rows-subgrid col-span-full md:col-span-5 row-span-2 gap-y-14 self-start'>
       <Header title='Blog' totalPosts={postCount} />
       <FilterGroup filterItems={postCountByTags} />
     </div>

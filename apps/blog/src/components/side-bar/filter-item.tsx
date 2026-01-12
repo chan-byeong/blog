@@ -7,6 +7,7 @@ interface FilterItemProps extends React.ComponentPropsWithRef<typeof Checkbox> {
   label: string;
   postsCount: number;
 }
+// TODO: CSS @apply 또는 tv, cva 적용하기
 
 export const FilterItem = ({
   label,
@@ -16,7 +17,6 @@ export const FilterItem = ({
   onCheckedChange,
   ...props
 }: FilterItemProps) => {
-  // TODO: 컨텍스트로 체크박스 상태 관리 -> 체크 여부에 따라 게시글 필터링
   const [isChecked, setIsChecked] = useState(
     defaultChecked || checked || false
   );
@@ -30,19 +30,23 @@ export const FilterItem = ({
 
   return (
     <div
-      className='flex items-center gap-2 group cursor-pointer'
+      className='flex items-center gap-1 group cursor-pointer'
       data-state={checkState ? 'checked' : 'unchecked'}
       onClick={() => handleCheckedChange(!checkState)}
+      role='checkbox'
+      aria-checked={checkState === true}
+      aria-label={label}
     >
       <Checkbox
         checked={checkState}
         onCheckedChange={handleCheckedChange}
         {...props}
+        className='hidden md:block mr-1'
       />
-      <span className='text-sm font-medium text-primary/80 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold group-hover:font-semibold group-hover:text-foreground'>
+      <span className='text-sm font-medium text-primary/80 transition-colors group-hover:font-semibold group-hover:text-primary group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold'>
         {label}
       </span>
-      <span className='text-xs font-medium text-primary/60 transition-colors group-data-[state=checked]:text-primary group-data-[state=checked]:font-semibold group-hover:font-semibold group-hover:text-foreground'>
+      <span className='text-xs font-medium text-primary/60 transition-colors group-hover:font-semibold group-hover:text-primary/80 group-data-[state=checked]:text-primary/80 group-data-[state=checked]:font-semibold'>
         ({postsCount})
       </span>
     </div>
