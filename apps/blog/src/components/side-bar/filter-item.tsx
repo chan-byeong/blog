@@ -2,6 +2,8 @@
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { useState } from 'react';
+import { usePostStore } from '@/providers/post-provider';
+import { useShallow } from 'zustand/react/shallow';
 
 interface FilterItemProps extends React.ComponentPropsWithRef<typeof Checkbox> {
   label: string;
@@ -17,6 +19,12 @@ export const FilterItem = ({
   onCheckedChange,
   ...props
 }: FilterItemProps) => {
+  const { addSelectedTag, removeSelectedTag } = usePostStore(
+    useShallow((store) => ({
+      addSelectedTag: store.addSelectedTag,
+      removeSelectedTag: store.removeSelectedTag,
+    }))
+  );
   const [isChecked, setIsChecked] = useState(
     defaultChecked || checked || false
   );
@@ -24,6 +32,11 @@ export const FilterItem = ({
   const handleCheckedChange = (value: boolean) => {
     setIsChecked(value);
     onCheckedChange?.(value);
+    if (value) {
+      addSelectedTag(label);
+    } else {
+      removeSelectedTag(label);
+    }
   };
 
   const checkState = checked !== undefined ? checked : isChecked;
