@@ -74,7 +74,7 @@ export default async function PostPage({ params }: PostPageProps) {
         />
       </section>
       <section className='grid grid-cols-subgrid col-span-full mt-8 md:mt-16 gap-y-4'>
-        <div className='sticky top-10 md:top-24 grid grid-cols-subgrid col-span-full md:col-start-1 md:col-span-6 self-start bg-background/80 backdrop-blur-md'>
+        <div className='sticky top-10 md:top-24 grid grid-cols-subgrid col-span-full md:col-start-1 md:col-span-6 self-start bg-background/80 backdrop-blur-md mr-2'>
           {/* 목차 (TOC) - 큰 화면에서만 표시 */}
           {tocItems.length > 0 && (
             <PostSideBar
