@@ -92,7 +92,8 @@ export const PostSideBar = ({
       </button>
 
       <div
-        className={`grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
+        id='toc-content'
+        className={`grid grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
           isTocVisible
             ? 'max-h-[1000px] opacity-100 translate-y-0'
             : 'max-h-0 opacity-0 -translate-y-4'
