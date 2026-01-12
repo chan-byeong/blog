@@ -6,6 +6,7 @@ import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
 import { ThemeProvider } from '../components/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
+import { Footer } from '@/components/footer';
 
 const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
@@ -44,6 +45,7 @@ export default function RootLayout({
           <ThemeProvider>
             <NavBar />
             {children}
+            <Footer />
           </ThemeProvider>
         </main>
         <Analytics />
