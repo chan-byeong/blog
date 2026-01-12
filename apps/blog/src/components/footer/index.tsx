@@ -14,6 +14,8 @@ export const Footer = () => {
         <Link
           href='https://github.com/chan-byeong'
           className='flex items-center gap-1'
+          target='_blank'
+          rel='noopener noreferrer'
         >
           <i className='hn hn-github inline-block' />
           GITHUB
