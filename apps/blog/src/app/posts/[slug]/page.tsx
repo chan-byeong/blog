@@ -73,8 +73,8 @@ export default async function PostPage({ params }: PostPageProps) {
           tags={post.tags || []}
         />
       </section>
-      <section className='grid grid-cols-subgrid col-span-full mt-16'>
-        <div className='sticky top-24 grid grid-cols-subgrid col-start-1 col-span-6 self-start'>
+      <section className='grid grid-cols-subgrid col-span-full mt-8 md:mt-16 gap-y-4'>
+        <div className='sticky top-10 md:top-24 grid grid-cols-subgrid col-span-full md:col-start-1 md:col-span-6 self-start bg-background/80 backdrop-blur-md'>
           {/* 목차 (TOC) - 큰 화면에서만 표시 */}
           {tocItems.length > 0 && (
             <PostSideBar
@@ -87,10 +87,10 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </div>
         {/* 메인 컨텐츠 그리드 */}
-        <div className='grid grid-cols-subgrid col-start-7 col-span-18 px-6'>
+        <div className='grid grid-cols-subgrid col-span-full md:col-start-7 md:col-span-18'>
           <div className='grid-cols-subgrid col-span-full items-start'>
             <TableHeader className='col-span-full'>
-              <span className='col-span-full text-primary text-sm font-semibold uppercase'>
+              <span className='col-span-full text-primary text-xs font-semibold uppercase'>
                 / Contents
               </span>
             </TableHeader>
