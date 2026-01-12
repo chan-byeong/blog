@@ -24,8 +24,8 @@ export const metadata: Metadata = {
   description: "Byeoung's Blog",
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
+      { url: './icon.svg', type: 'image/svg+xml' },
+      { url: './favicon.ico', sizes: 'any' },
     ],
   },
 };
