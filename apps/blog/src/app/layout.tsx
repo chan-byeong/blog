@@ -31,6 +31,12 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Provides the application's root HTML layout, wrapping page content with global fonts, theme provider, navigation, footer, and analytics.
+ *
+ * @param children - Page content to render inside the layout
+ * @returns The root HTML element tree for the application
+ */
 export default function RootLayout({
   children,
 }: Readonly<{
