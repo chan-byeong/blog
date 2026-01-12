@@ -33,6 +33,9 @@ export const FilterItem = ({
       className='flex items-center gap-1 group cursor-pointer'
       data-state={checkState ? 'checked' : 'unchecked'}
       onClick={() => handleCheckedChange(!checkState)}
+      role='checkbox'
+      aria-checked={checkState === true}
+      aria-label={label}
     >
       <Checkbox
         checked={checkState}
