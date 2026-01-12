@@ -53,7 +53,7 @@ export const PostSideBar = ({
   }, []);
 
   const handleToggleToc = () => {
-    setIsTocVisible(!isTocVisible);
+    setIsTocVisible((prev) => !prev);
   };
 
   return (
@@ -84,6 +84,8 @@ export const PostSideBar = ({
         className='col-span-full cursor-pointer text-[15px] font-medium inline-flex self-start group items-center gap-x-2 hover:bg-muted-foreground/20 transition-colors my-2 mr-4 py-1 rounded-xs data-[state=closed]:text-primary/80'
         onClick={handleToggleToc}
         data-state={isTocVisible ? 'open' : 'closed'}
+        aria-expanded={isTocVisible}
+        aria-controls='toc-content'
       >
         <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
         Table of Contents
