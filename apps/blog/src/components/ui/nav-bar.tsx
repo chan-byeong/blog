@@ -3,21 +3,38 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 import { NavButton } from './nav-button';
 import { useTheme } from 'next-themes';
 
 const navItems = [
   { label: 'BLOG', href: '/', key: 'B' },
-  { label: 'GITHUB', href: 'https://github.com/chan-byeong', key: 'G' },
+  {
+    label: 'GITHUB',
+    href: 'https://github.com/chan-byeong',
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    key: 'G',
+  },
 ];
 
 export const NavBar = () => {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
-    <nav className='fixed top-0 left-1/2 -translate-x-1/2 z-50 flex w-full items-center justify-between bg-background/80 px-8 py-2 backdrop-blur-md'>
+    <nav className='fixed top-0 left-1/2 -translate-x-1/2 z-50 flex w-full items-center justify-between bg-background/80 px-2 md:px-8 py-2 backdrop-blur-md'>
       <div className='flex items-center gap-2'>
         {/* 로고 아이콘 -> 아이콘 만들고 수정 필요*/}
         <Link
@@ -37,6 +54,8 @@ export const NavBar = () => {
                     label={item.label}
                     shortcutKey={item.key}
                     href={item.href}
+                    {...(item.target && { target: item.target })}
+                    {...(item.rel && { rel: item.rel })}
                     active={isActive}
                   />
                 </NavigationMenu.Item>
