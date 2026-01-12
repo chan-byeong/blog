@@ -8,9 +8,9 @@ interface FilterGroupProps {
 
 export const FilterGroup = ({ filterItems = {} }: FilterGroupProps) => {
   return (
-    <aside className='grid grid-cols-subgrid col-span-4 gap-y-4 self-start'>
+    <aside className='grid grid-cols-subgrid col-span-full md:col-span-4 gap-y-4 self-start'>
       <TableHeader className='col-span-full'>
-        <span className='col-start-1 col-span-3 text-primary text-sm font-semibold uppercase'>
+        <span className='col-start-1 col-span-3 text-primary text-xs font-semibold uppercase'>
           / filters
         </span>
       </TableHeader>
@@ -22,7 +22,7 @@ export const FilterGroup = ({ filterItems = {} }: FilterGroupProps) => {
           </Accordion.Trigger>
           <Accordion.Content>
             <div className='flex flex-col ml-2.5 mt-2'>
-              <ul className='flex flex-col gap-y-1 border-l border-border border-dotted pl-3.5'>
+              <ul className='flex gap-x-2 md:flex-col md:gap-y-1 md:border-l md:border-border/50 md:border-dotted md:pl-3.5'>
                 {Object.entries(filterItems).map(([tag, count]) => (
                   <li key={tag}>
                     <FilterItem label={tag} postsCount={count} />
