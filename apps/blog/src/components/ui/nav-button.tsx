@@ -1,4 +1,5 @@
-// apps/blog/src/components/ui/nav-button.tsx
+'use client';
+
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
@@ -46,14 +47,14 @@ export const NavButton = ({
 
   if (href) {
     return (
-      <Link href={href} className={combinedClassName}>
+      <Link href={href} className={combinedClassName} onClick={onClick}>
         {content}
       </Link>
     );
   }
 
   return (
-    <button onClick={onClick} className={combinedClassName}>
+    <button type='button' className={combinedClassName} onClick={onClick}>
       {content}
     </button>
   );

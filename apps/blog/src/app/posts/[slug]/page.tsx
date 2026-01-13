@@ -6,6 +6,7 @@ import { PostContent } from '../../../components/post/post-content';
 import type { Metadata } from 'next';
 import { PostSideBar } from '@/components/post/post-side-bar';
 import { TableHeader } from '@/components/ui/table-header';
+import { PostReadTracker } from '@/components/post/post-read-tracker';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -65,6 +66,9 @@ export default async function PostPage({ params }: PostPageProps) {
 
   return (
     <div className='grid grid-cols-subgrid col-span-full mt-20'>
+      {/* 포스트 읽기 추적 (30초 이상 체류 시 이벤트 발생) */}
+      <PostReadTracker slug={post.slug} title={post.title} />
+
       <section className='grid grid-cols-subgrid col-span-full'>
         <PostHeader
           title={post.title}

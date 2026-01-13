@@ -7,6 +7,7 @@ import './globals.css';
 import { ThemeProvider } from '../providers/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
 import { Footer } from '@/components/footer';
+import { GoogleAnalytics } from '@/components/google-analytics';
 
 const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
@@ -49,6 +50,7 @@ export default function RootLayout({
           </ThemeProvider>
         </main>
         <Analytics />
+        <GoogleAnalytics />
       </body>
     </html>
   );
