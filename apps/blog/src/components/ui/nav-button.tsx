@@ -54,7 +54,7 @@ export const NavButton = ({
   }
 
   return (
-    <button role='button' className={combinedClassName} onClick={onClick}>
+    <button type='button' className={combinedClassName} onClick={onClick}>
       {content}
     </button>
   );
