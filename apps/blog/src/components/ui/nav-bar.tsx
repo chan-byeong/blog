@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import { NavButton } from './nav-button';
 import { useTheme } from 'next-themes';
+import { trackClickNavButton } from '@/lib/analytics';
 
 const navItems = [
   { label: 'BLOG', href: '/', key: 'B' },
@@ -57,6 +58,8 @@ export const NavBar = () => {
                     {...(item.target && { target: item.target })}
                     {...(item.rel && { rel: item.rel })}
                     active={isActive}
+                    onClick={() => trackClickNavButton(item.label)}
+                    aria-label={item.label}
                   />
                 </NavigationMenu.Item>
               );
@@ -71,6 +74,7 @@ export const NavBar = () => {
         active={false}
         onClick={() => {
           setTheme(theme === 'dark' ? 'light' : 'dark');
+          trackClickNavButton('theme toggle');
         }}
         aria-label='theme toggle'
       />
