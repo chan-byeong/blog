@@ -46,14 +46,14 @@ export const NavButton = ({
 
   if (href) {
     return (
-      <Link href={href} className={combinedClassName}>
+      <Link href={href} className={combinedClassName} onClick={onClick}>
         {content}
       </Link>
     );
   }
 
   return (
-    <button onClick={onClick} className={combinedClassName}>
+    <button className={combinedClassName} onClick={onClick}>
       {content}
     </button>
   );
