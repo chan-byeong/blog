@@ -29,10 +29,7 @@ export const siteMetadata: Metadata = {
   creator: '@chan-byeong',
 
   icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: 'any' },
-    ],
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
   },
   openGraph: {
     type: 'website',
