@@ -12,9 +12,6 @@ interface PostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-/**
- * 정적 경로 생성
- */
 export async function generateStaticParams() {
   const slugs = await getAllPostSlugs();
   return slugs.map((slug) => ({
@@ -22,9 +19,6 @@ export async function generateStaticParams() {
   }));
 }
 
-/**
- * 메타데이터 생성
- */
 export async function generateMetadata({
   params,
 }: PostPageProps): Promise<Metadata> {
