@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Post } from '@/types/post';
+import { trackClickPost } from '@/lib/analytics';
 
 interface PostListItemProps {
   post: Post;
@@ -10,11 +11,16 @@ interface PostListItemProps {
 import { Tag } from '../ui/tag';
 
 export const PostListItem = ({ post }: PostListItemProps) => {
+  const handleClick = () => {
+    trackClickPost(post.slug, post.title);
+  };
+
   return (
     <li className='grid grid-cols-subgrid col-span-full items-center border-b-[0.5px] border-border/50'>
       <Link
         href={`/posts/${post.slug}`}
         className='grid grid-cols-subgrid col-span-full items-center py-2.5 px-1 self-start hover:bg-accent'
+        onClick={handleClick}
       >
         <span className='col-start-1 col-span-2 sm:col-span-3 text-xs font-semibold text-primary'>
           {post.date}

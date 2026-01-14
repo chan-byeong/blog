@@ -7,6 +7,8 @@ import './globals.css';
 import { ThemeProvider } from '../providers/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
 import { Footer } from '@/components/footer';
+import { GoogleAnalytics } from '@/components/google-analytics';
+import { siteMetadata } from '@/lib/metadata';
 
 const suit = localFont({
   src: './fonts/SUIT-Variable.woff2',
@@ -20,16 +22,7 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-export const metadata: Metadata = {
-  title: 'Byeoung Blog',
-  description: "Byeoung's Blog",
-  icons: {
-    icon: [
-      { url: './icon.svg', type: 'image/svg+xml' },
-      { url: './favicon.ico', sizes: 'any' },
-    ],
-  },
-};
+export const metadata: Metadata = siteMetadata;
 
 export default function RootLayout({
   children,
@@ -49,6 +42,7 @@ export default function RootLayout({
           </ThemeProvider>
         </main>
         <Analytics />
+        <GoogleAnalytics />
       </body>
     </html>
   );
