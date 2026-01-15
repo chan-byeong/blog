@@ -12,7 +12,7 @@ export const Footer = () => {
           SITEMAP
         </Link>
         <Link
-          href='https://github.com/chan-byeong'
+          href='https://github.com/chan-byeong/blog'
           className='flex items-center gap-1'
           target='_blank'
           rel='noopener noreferrer'
