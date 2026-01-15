@@ -22,9 +22,9 @@ export const FilterGroup = ({ filterItems = {} }: FilterGroupProps) => {
           </Accordion.Trigger>
           <Accordion.Content>
             <div className='flex flex-col ml-2.5 mt-2'>
-              <ul className='flex gap-x-2 md:flex-col md:gap-y-1 md:border-l md:border-border/50 md:border-dotted md:pl-3.5'>
+              <ul className='flex gap-x-2 overflow-x-auto no-scrollbar md:flex-col md:gap-y-1 md:border-l md:border-border/50 md:border-dotted md:pl-3.5'>
                 {Object.entries(filterItems).map(([tag, count]) => (
-                  <li key={tag}>
+                  <li key={tag} className='whitespace-nowrap'>
                     <FilterItem label={tag} postsCount={count} />
                   </li>
                 ))}

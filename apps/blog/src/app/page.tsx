@@ -9,7 +9,7 @@ export default async function Home() {
   return (
     <PostStoreProvider initialState={posts}>
       <div className='grid grid-cols-subgrid col-span-full min-h-[calc(100dvh-41px)]'>
-        <section className='grid grid-cols-subgrid self-start col-span-full pt-20 gap-y-8 md:gap-y-14 items-start'>
+        <section className='grid grid-cols-subgrid self-start col-span-full pt-10 md:pt-20 gap-y-8 md:gap-y-14 items-start'>
           <SideBar />
           <PostsSection />
         </section>

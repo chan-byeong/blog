@@ -59,7 +59,6 @@ export const NavBar = () => {
                     {...(item.rel && { rel: item.rel })}
                     active={isActive}
                     onClick={() => trackClickNavButton(item.label)}
-                    aria-label={item.label}
                   />
                 </NavigationMenu.Item>
               );
