@@ -4,7 +4,7 @@ import { PostList } from './post-list';
 // TODO: 헤더 영역 CSS @apply 또는 tv, cva 적용하기
 export const PostsSection = () => {
   return (
-    <div className='grid grid-cols-subgrid md:col-start-6 col-span-full md:row-start-2'>
+    <div className='grid grid-cols-subgrid self-start col-span-full md:row-start-2 md:row-span-2 md:col-start-6'>
       <TableHeader className='col-span-full text-xs'>
         <span className='col-start-1 col-span-2 sm:col-span-3 text-primary font-semibold uppercase'>
           / Date
