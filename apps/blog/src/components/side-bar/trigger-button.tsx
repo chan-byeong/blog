@@ -15,23 +15,23 @@ export const TriggerButton = ({
     <button
       ref={ref}
       className={cn(
-        'cursor-pointer hover:bg-muted-foreground/20 transition-colors rounded-sm p-1',
+        'hover:bg-muted-foreground/20 cursor-pointer rounded-sm p-1 transition-colors',
         className
       )}
       {...props}
     >
-      <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
+      <i className='hn hn-angle-right fill-foreground dark:fill-foreground transition-transform duration-200 group-data-[state=open]:rotate-90'></i>
 
       <div>
         {/* 라이트모드: 닫힘, 열림 아이콘 */}
-        <i className='inline-block dark:hidden group-data-[state=open]:hidden hn hn-folder-solid' />
-        <i className='hidden dark:hidden group-data-[state=open]:inline-block hn hn-folder-open-solid' />
+        <i className='hn hn-folder-solid inline-block group-data-[state=open]:hidden dark:hidden' />
+        <i className='hn hn-folder-open-solid hidden group-data-[state=open]:inline-block dark:hidden' />
 
         {/* 다크모드: 닫힘, 열림 아이콘 */}
-        <i className='hidden dark:inline-block dark:group-data-[state=open]:hidden hn hn-folder' />
-        <i className='hidden dark:group-data-[state=open]:inline-block hn hn-folder-open' />
+        <i className='hn hn-folder hidden dark:inline-block dark:group-data-[state=open]:hidden' />
+        <i className='hn hn-folder-open hidden dark:group-data-[state=open]:inline-block' />
       </div>
-      <span className='text-[15px] font-medium text-primary/80 group-data-[state=open]:font-semibold group-data-[state=open]:text-primary'>
+      <span className='text-primary/80 group-data-[state=open]:text-primary text-[15px] font-medium group-data-[state=open]:font-semibold'>
         {children}
       </span>
     </button>

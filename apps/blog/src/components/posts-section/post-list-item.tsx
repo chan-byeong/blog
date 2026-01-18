@@ -16,19 +16,19 @@ export const PostListItem = ({ post }: PostListItemProps) => {
   };
 
   return (
-    <li className='grid grid-cols-subgrid col-span-full items-center border-b-[0.5px] border-border/50'>
+    <li className='border-border/50 col-span-full grid grid-cols-subgrid items-center border-b-[0.5px]'>
       <Link
         href={`/posts/${post.slug}`}
-        className='grid grid-cols-subgrid col-span-full items-center py-2.5 px-1 self-start hover:bg-accent'
+        className='hover:bg-accent col-span-full grid grid-cols-subgrid items-center self-start px-1 py-2.5'
         onClick={handleClick}
       >
-        <span className='col-start-1 col-span-2 sm:col-span-3 text-xs font-semibold text-primary'>
+        <span className='text-primary col-span-2 col-start-1 text-xs font-semibold sm:col-span-3'>
           {post.date}
         </span>
-        <span className='col-start-3 col-span-4 sm:col-start-4 sm:col-span-10 md:col-span-13 text-md font-bold text-primary'>
+        <span className='text-md text-primary col-span-4 col-start-3 font-bold sm:col-span-10 sm:col-start-4 md:col-span-13'>
           {post.title}
         </span>
-        <span className='col-start-7 col-span-2 sm:col-start-14 sm:col-span-3 md:col-start-17 md:col-span-3 text-sm font-semibold text-primary truncate'>
+        <span className='text-primary col-span-2 col-start-7 truncate text-sm font-semibold sm:col-span-3 sm:col-start-14 md:col-span-3 md:col-start-17'>
           {post.tags?.map((tag) => (
             <Tag key={tag} label={`# ${tag}`} />
           ))}

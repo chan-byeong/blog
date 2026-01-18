@@ -59,11 +59,11 @@ export default async function PostPage({ params }: PostPageProps) {
   const tocItems = extractTOC(post.content);
 
   return (
-    <div className='grid grid-cols-subgrid col-span-full mt-20'>
+    <div className='col-span-full mt-20 grid grid-cols-subgrid'>
       {/* 포스트 읽기 추적 (30초 이상 체류 시 이벤트 발생) */}
       <PostReadTracker slug={post.slug} title={post.title} />
 
-      <section className='grid grid-cols-subgrid col-span-full'>
+      <section className='col-span-full grid grid-cols-subgrid'>
         <PostHeader
           title={post.title}
           description={post.description}
@@ -71,8 +71,8 @@ export default async function PostPage({ params }: PostPageProps) {
           tags={post.tags || []}
         />
       </section>
-      <section className='grid grid-cols-subgrid col-span-full mt-8 md:mt-16 gap-y-4'>
-        <div className='sticky top-10 md:top-24 grid grid-cols-subgrid col-span-full md:col-start-1 md:col-span-6 self-start bg-background/80 backdrop-blur-md mr-2'>
+      <section className='col-span-full mt-8 grid grid-cols-subgrid gap-y-4 md:mt-16'>
+        <div className='bg-background/80 sticky top-10 col-span-full mr-2 grid grid-cols-subgrid self-start backdrop-blur-md md:top-24 md:col-span-6 md:col-start-1'>
           {/* 목차 (TOC) - 큰 화면에서만 표시 */}
           {tocItems.length > 0 && (
             <PostSideBar
@@ -85,14 +85,14 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </div>
         {/* 메인 컨텐츠 그리드 */}
-        <div className='grid grid-cols-subgrid col-span-full md:col-start-7 md:col-span-18'>
-          <div className='grid-cols-subgrid col-span-full items-start'>
+        <div className='col-span-full grid grid-cols-subgrid md:col-span-18 md:col-start-7'>
+          <div className='col-span-full grid-cols-subgrid items-start'>
             <TableHeader className='col-span-full'>
-              <span className='col-span-full text-primary text-xs font-semibold uppercase'>
+              <span className='text-primary col-span-full text-xs font-semibold uppercase'>
                 / Contents
               </span>
             </TableHeader>
-            <article className='grid grid-cols-subgrid col-span-full items-start'>
+            <article className='col-span-full grid grid-cols-subgrid items-start'>
               <PostContent>{content}</PostContent>
             </article>
           </div>

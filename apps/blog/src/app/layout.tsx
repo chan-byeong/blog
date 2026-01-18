@@ -32,9 +32,9 @@ export default function RootLayout({
   return (
     <html lang='ko' suppressHydrationWarning>
       <body
-        className={`${suit.variable} ${inter.variable} font-suit antialiased bg-background selection:bg-accent`}
+        className={`${suit.variable} ${inter.variable} font-suit bg-background selection:bg-accent antialiased`}
       >
-        <main className='grid items-start w-full max-w-7xl mx-auto min-h-dvh auto-rows-auto grid-flow-row px-2 md:px-6 gap-0 grid-cols-8 md:grid-cols-[repeat(24,1fr)] sm:grid-cols-[repeat(16,1fr)]'>
+        <main className='mx-auto grid min-h-dvh w-full max-w-7xl grid-flow-row auto-rows-auto grid-cols-8 items-start gap-0 px-2 sm:grid-cols-[repeat(16,1fr)] md:grid-cols-[repeat(24,1fr)] md:px-6'>
           <ThemeProvider>
             <NavBar />
             {children}
