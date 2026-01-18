@@ -1,1 +1,6 @@
 node_modules
+.DS_Store
+
+# Docker 관련 (루트)
+apps/blog/nginx/ssl/*.pem
+apps/blog/nginx/logs/*.log
