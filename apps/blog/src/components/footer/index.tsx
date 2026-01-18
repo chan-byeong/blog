@@ -2,8 +2,8 @@ import Link from 'next/link';
 
 export const Footer = () => {
   return (
-    <footer className='border-border/50 text-primary/70 col-span-full mt-10 grid grid-cols-subgrid border-t-[0.5px] py-3'>
-      <div className='col-span-3 col-start-1 text-xs sm:col-span-4 sm:col-start-1 md:col-span-5 md:col-start-1'>
+    <footer className='grid grid-cols-subgrid col-span-full border-t-[0.5px] border-border/50 py-3 text-primary/70 mt-10'>
+      <div className='col-start-1 col-span-3 sm:col-start-1 sm:col-span-4 md:col-start-1 md:col-span-5 text-xs'>
         <span>© {new Date().getFullYear()} BYEOUNG.DEV</span>
       </div>
       <div className='col-span-4 col-start-5 flex items-center justify-end gap-2 text-xs sm:col-span-4 sm:col-start-13 md:col-span-5 md:col-start-20'>

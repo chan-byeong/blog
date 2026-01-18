@@ -21,8 +21,8 @@ export const FilterGroup = ({ filterItems = {} }: FilterGroupProps) => {
             <TriggerButton>Tags</TriggerButton>
           </Accordion.Trigger>
           <Accordion.Content>
-            <div className='mt-2 ml-2.5 flex flex-col'>
-              <ul className='no-scrollbar md:border-border/50 flex gap-x-2 overflow-x-auto md:flex-col md:gap-y-1 md:border-l md:border-dotted md:pl-3.5'>
+            <div className='flex flex-col ml-2.5 mt-2'>
+              <ul className='flex gap-x-2 overflow-x-auto no-scrollbar md:flex-col md:gap-y-1 md:border-l md:border-border/50 md:border-dotted md:pl-3.5'>
                 {Object.entries(filterItems).map(([tag, count]) => (
                   <li key={tag} className='whitespace-nowrap'>
                     <FilterItem label={tag} postsCount={count} />
