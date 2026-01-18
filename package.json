@@ -1,0 +1,12 @@
+{
+  "name": "blog-monorepo",
+  "version": "1.0.1",
+  "private": true,
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "dev": "pnpm --filter blog dev",
+    "build": "pnpm --filter blog build",
+    "start": "pnpm --filter blog start",
+    "lint": "pnpm --filter blog lint"
+  }
+}

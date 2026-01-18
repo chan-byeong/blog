@@ -1,0 +1,95 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR (선택사항)
+        if: false  # ECR 사용 시 true로 변경
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          APP_DIR: /home/ubuntu/blog
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          envs: APP_DIR
+          script: |
+            set -e
+            
+            echo "🚀 Starting deployment..."
+            
+            # 애플리케이션 디렉토리로 이동
+            cd $APP_DIR
+            
+            # Git pull (최신 코드 가져오기)
+            echo "📥 Pulling latest changes..."
+            git pull origin main
+            
+            # Docker Compose로 컨테이너 빌드 및 재시작
+            echo "🐳 Building and restarting containers..."
+            docker-compose down
+            docker-compose build --no-cache
+            docker-compose up -d
+            
+            # 이전 이미지 정리
+            echo "🧹 Cleaning up old images..."
+            docker image prune -af --filter "until=24h"
+            
+            # 컨테이너 상태 확인
+            echo "✅ Checking container status..."
+            docker-compose ps
+            
+            # 로그 확인
+            echo "📋 Recent logs:"
+            docker-compose logs --tail=50
+            
+            echo "✨ Deployment completed successfully!"
+
+      - name: Health check
+        run: |
+          echo "🏥 Performing health check..."
+          sleep 30
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://byeoung.dev/health || echo "000")
+          if [ "$response" = "200" ]; then
+            echo "✅ Health check passed!"
+          else
+            echo "❌ Health check failed with status code: $response"
+            exit 1
+          fi
+
+      - name: Notify deployment status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Deployment to EC2: ${{ job.status }}
+            Branch: ${{ github.ref }}
+            Commit: ${{ github.sha }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
