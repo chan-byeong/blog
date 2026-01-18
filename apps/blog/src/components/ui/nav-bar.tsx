@@ -35,7 +35,7 @@ export const NavBar = () => {
   }
 
   return (
-    <nav className='fixed top-0 left-1/2 -translate-x-1/2 z-50 flex w-full items-center justify-between bg-background/80 px-2 md:px-8 py-2 backdrop-blur-md'>
+    <nav className='bg-background/80 fixed top-0 left-1/2 z-50 flex w-full -translate-x-1/2 items-center justify-between px-2 py-2 backdrop-blur-md md:px-8'>
       <div className='flex items-center gap-2'>
         {/* 로고 아이콘 -> 아이콘 만들고 수정 필요*/}
         <Link

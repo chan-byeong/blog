@@ -8,9 +8,9 @@ interface FilterGroupProps {
 
 export const FilterGroup = ({ filterItems = {} }: FilterGroupProps) => {
   return (
-    <aside className='grid grid-cols-subgrid col-span-full md:col-span-4 gap-y-4 self-start'>
+    <aside className='col-span-full grid grid-cols-subgrid gap-y-4 self-start md:col-span-4'>
       <TableHeader className='col-span-full'>
-        <span className='col-start-1 col-span-3 text-primary text-xs font-semibold uppercase'>
+        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / filters
         </span>
       </TableHeader>

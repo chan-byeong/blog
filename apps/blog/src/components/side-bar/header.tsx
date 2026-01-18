@@ -6,13 +6,13 @@ interface HeaderProps extends React.HTMLAttributes<HTMLHeadingElement> {
 export const Header = ({ title, totalPosts, ...props }: HeaderProps) => {
   return (
     <h2
-      className='col-span-full flex tracking-tighter font-medium font-inter text-primary self-start'
+      className='font-inter text-primary col-span-full flex self-start font-medium tracking-tighter'
       style={{ fontSize: 'clamp(2rem, 8vw, 6rem)' }}
       {...props}
     >
       {title}
       <sup
-        className='tracking-tight font-normal text-primary translate-y-7'
+        className='text-primary translate-y-7 font-normal tracking-tight'
         style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}
       >
         ( {totalPosts} )

@@ -12,14 +12,14 @@ interface CodeBlockProps {
  */
 export function CodeBlock({ children, language, filename }: CodeBlockProps) {
   return (
-    <div className='my-6 overflow-hidden rounded-sm border-[0.5px] border-border bg-muted/20'>
+    <div className='border-border bg-muted/20 my-6 overflow-hidden rounded-sm border-[0.5px]'>
       {filename && (
-        <div className='flex items-center justify-between border-b border-border bg-muted px-4 py-2'>
-          <span className='text-sm font-medium text-muted-foreground'>
+        <div className='border-border bg-muted flex items-center justify-between border-b px-4 py-2'>
+          <span className='text-muted-foreground text-sm font-medium'>
             {filename}
           </span>
           {language && (
-            <span className='text-xs text-muted-foreground'>{language}</span>
+            <span className='text-muted-foreground text-xs'>{language}</span>
           )}
         </div>
       )}

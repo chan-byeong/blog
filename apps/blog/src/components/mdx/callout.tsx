@@ -39,9 +39,9 @@ export function Callout({ children, type = 'info', title }: CalloutProps) {
         <span className={`text-xl ${iconStyles[type]}`}>{icons[type]}</span>
         <div className='flex-1'>
           {title && (
-            <h4 className='mb-2 font-semibold text-foreground'>{title}</h4>
+            <h4 className='text-foreground mb-2 font-semibold'>{title}</h4>
           )}
-          <div className='text-sm text-foreground/90'>{children}</div>
+          <div className='text-foreground/90 text-sm'>{children}</div>
         </div>
       </div>
     </div>

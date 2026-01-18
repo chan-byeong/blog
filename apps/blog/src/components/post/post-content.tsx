@@ -10,8 +10,8 @@ interface PostContentProps {
  */
 export function PostContent({ children }: PostContentProps) {
   return (
-    <article className='grid grid-cols-subgrid col-span-full prose prose-lg dark:prose-invert max-w-none'>
-      <div className='grid grid-cols-subgrid col-span-full mdx-content min-w-0'>
+    <article className='prose prose-lg dark:prose-invert col-span-full grid max-w-none grid-cols-subgrid'>
+      <div className='mdx-content col-span-full grid min-w-0 grid-cols-subgrid'>
         {children}
       </div>
     </article>

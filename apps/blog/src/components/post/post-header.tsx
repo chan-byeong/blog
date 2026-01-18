@@ -23,13 +23,13 @@ export function PostHeader({
     <header
       id={!isScrollDown ? 'main-post-header' : undefined}
       className={
-        isScrollDown ? 'col-span-full mb-4' : 'grid-cols-subgrid col-span-full'
+        isScrollDown ? 'col-span-full mb-4' : 'col-span-full grid-cols-subgrid'
       }
     >
       <div className='space-y-2'>
         <h1
-          className={`font-semibold tracking-tight text-foreground ${
-            isScrollDown ? 'text-xl' : 'text-4xl md:text-5xl leading-tight'
+          className={`text-foreground font-semibold tracking-tight ${
+            isScrollDown ? 'text-xl' : 'text-4xl leading-tight md:text-5xl'
           }`}
         >
           {title}
@@ -44,7 +44,7 @@ export function PostHeader({
       <div className='flex flex-wrap items-center gap-4 pt-4'>
         <time
           dateTime={date}
-          className='text-sm text-muted-foreground flex items-center gap-2'
+          className='text-muted-foreground flex items-center gap-2 text-sm'
         >
           <i className='hn hn-calender'></i>
           {new Date(date).toLocaleDateString('ko-KR', {

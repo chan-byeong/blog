@@ -10,7 +10,7 @@ export const MDXComponents: MDXComponentsType = {
   // 헤딩
   h1: ({ children, ...props }) => (
     <h1
-      className='mb-6 mt-8 text-4xl font-bold tracking-tight text-foreground scroll-mt-20'
+      className='text-foreground mt-8 mb-6 scroll-mt-20 text-4xl font-bold tracking-tight'
       {...props}
     >
       {children}
@@ -18,7 +18,7 @@ export const MDXComponents: MDXComponentsType = {
   ),
   h2: ({ children, ...props }) => (
     <h2
-      className='mb-4 mt-8 text-3xl font-semibold tracking-tight text-foreground scroll-mt-20 pb-2'
+      className='text-foreground mt-8 mb-4 scroll-mt-20 pb-2 text-3xl font-semibold tracking-tight'
       {...props}
     >
       {children}
@@ -26,7 +26,7 @@ export const MDXComponents: MDXComponentsType = {
   ),
   h3: ({ children, ...props }) => (
     <h3
-      className='mb-3 mt-6 text-2xl font-semibold tracking-tight text-foreground scroll-mt-20'
+      className='text-foreground mt-6 mb-3 scroll-mt-20 text-2xl font-semibold tracking-tight'
       {...props}
     >
       {children}
@@ -34,7 +34,7 @@ export const MDXComponents: MDXComponentsType = {
   ),
   h4: ({ children, ...props }) => (
     <h4
-      className='mb-2 mt-4 text-xl font-semibold tracking-tight text-foreground scroll-mt-20'
+      className='text-foreground mt-4 mb-2 scroll-mt-20 text-xl font-semibold tracking-tight'
       {...props}
     >
       {children}
@@ -43,7 +43,7 @@ export const MDXComponents: MDXComponentsType = {
 
   // 단락
   p: ({ children, ...props }) => (
-    <p className='mb-4 leading-7 text-foreground/90' {...props}>
+    <p className='text-foreground/90 mb-4 leading-7' {...props}>
       {children}
     </p>
   ),
@@ -52,7 +52,7 @@ export const MDXComponents: MDXComponentsType = {
   a: ({ children, href, ...props }) => (
     <a
       href={href}
-      className='font-medium text-primary underline decoration-primary/30 underline-offset-4 hover:decoration-primary transition-colors'
+      className='text-primary decoration-primary/30 hover:decoration-primary font-medium underline underline-offset-4 transition-colors'
       {...props}
     >
       {children}
@@ -61,13 +61,13 @@ export const MDXComponents: MDXComponentsType = {
 
   // 리스트
   ul: ({ children, ...props }) => (
-    <ul className='mb-4 ml-6 list-disc space-y-2 text-foreground/90' {...props}>
+    <ul className='text-foreground/90 mb-4 ml-6 list-disc space-y-2' {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }) => (
     <ol
-      className='mb-4 ml-6 list-decimal space-y-2 text-foreground/90'
+      className='text-foreground/90 mb-4 ml-6 list-decimal space-y-2'
       {...props}
     >
       {children}
@@ -85,7 +85,7 @@ export const MDXComponents: MDXComponentsType = {
     if (!className) {
       return (
         <code
-          className='rounded bg-muted/20 px-1.5 py-0.5 font-mono text-sm text-foreground'
+          className='bg-muted/20 text-foreground rounded px-1.5 py-0.5 font-mono text-sm'
           {...props}
         >
           {children}
@@ -101,7 +101,7 @@ export const MDXComponents: MDXComponentsType = {
   },
   pre: ({ children, ...props }) => (
     <pre
-      className='mb-4 overflow-x-auto rounded-lg bg-muted/20 p-4 border border-border'
+      className='bg-muted/20 border-border mb-4 overflow-x-auto rounded-lg border p-4'
       {...props}
     >
       {children}
@@ -111,7 +111,7 @@ export const MDXComponents: MDXComponentsType = {
   // 인용문
   blockquote: ({ children, ...props }) => (
     <blockquote
-      className='mb-4 border-l-4 border-primary pl-4 italic text-muted-foreground'
+      className='border-primary text-muted-foreground mb-4 border-l-4 pl-4 italic'
       {...props}
     >
       {children}
@@ -132,31 +132,31 @@ export const MDXComponents: MDXComponentsType = {
     </thead>
   ),
   tbody: ({ children, ...props }) => (
-    <tbody className='divide-y divide-border' {...props}>
+    <tbody className='divide-border divide-y' {...props}>
       {children}
     </tbody>
   ),
   tr: ({ children, ...props }) => (
-    <tr className='border-b border-border' {...props}>
+    <tr className='border-border border-b' {...props}>
       {children}
     </tr>
   ),
   th: ({ children, ...props }) => (
     <th
-      className='px-4 py-2 text-left font-semibold text-foreground'
+      className='text-foreground px-4 py-2 text-left font-semibold'
       {...props}
     >
       {children}
     </th>
   ),
   td: ({ children, ...props }) => (
-    <td className='px-4 py-2 text-foreground/90' {...props}>
+    <td className='text-foreground/90 px-4 py-2' {...props}>
       {children}
     </td>
   ),
 
   // 구분선
-  hr: (props) => <hr className='my-8 border-border' {...props} />,
+  hr: (props) => <hr className='border-border my-8' {...props} />,
 
   // 이미지
   img: ({ src, alt, ...props }) => (
