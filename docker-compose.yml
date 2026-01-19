@@ -83,7 +83,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Promtail 설정 파일
       - ./promtail-grafana-cloud.yml:/etc/promtail/config.yml:ro
-    command: -config.file=/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml -config.expand-env=true
     networks:
       - blog-network
     logging:

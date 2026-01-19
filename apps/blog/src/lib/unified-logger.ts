@@ -42,7 +42,8 @@ class UnifiedLogger {
     const logLine = JSON.stringify(logEntry);
 
     if (typeof window === 'undefined') {
-      console.log(logLine);
+      // console.log 대신 process.stdout.write 사용 (로그 잘림 방지)
+      process.stdout.write(logLine + '\n');
     } else {
       fetch('/api/logs', {
         method: 'POST',

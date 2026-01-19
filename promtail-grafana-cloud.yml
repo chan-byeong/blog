@@ -39,7 +39,10 @@ scrape_configs:
         target_label: stream
 
     pipeline_stages:
-      # JSON 파싱
+      # 1단계: Docker CRI 형식 파싱 (Docker json-file driver)
+      - cri: {}
+
+      # 2단계: 애플리케이션 JSON 로그 파싱
       - json:
           expressions:
             timestamp: timestamp
@@ -58,8 +61,9 @@ scrape_configs:
             referer: referer
             host: host
             request_id: request_id
+            meta: meta
 
-      # 레이블 추가 (카디널리티 낮은 필드만)
+      # 3단계: 레이블 추가 (카디널리티 낮은 필드만)
       - labels:
           level:
           source:
@@ -67,7 +71,7 @@ scrape_configs:
           container:
           stream:
 
-      # 타임스탬프 파싱
+      # 4단계: 타임스탬프 파싱
       - timestamp:
           source: timestamp
           format: RFC3339Nano
@@ -76,7 +80,7 @@ scrape_configs:
             - '2006-01-02T15:04:05.000Z07:00'
             - '2006-01-02T15:04:05Z07:00'
 
-      # 출력 포맷 (message 필드 사용)
+      # 5단계: 출력 포맷 (message 필드 사용)
       - output:
           source: message
 
