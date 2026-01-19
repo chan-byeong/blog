@@ -72,6 +72,31 @@ services:
       timeout: 10s
       retries: 3
 
+  # Promtail (로그 수집 → Grafana Cloud)
+  promtail:
+    container_name: blog-promtail
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    volumes:
+      # Docker 컨테이너 로그 (stdout/stderr)
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Promtail 설정 파일
+      - ./promtail-grafana-cloud.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - blog-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: '{{.Name}}'
+    environment:
+      - LOKI_URL=${GRAFANA_CLOUD_LOKI_URL}
+      - LOKI_USER=${GRAFANA_CLOUD_LOKI_USER}
+      - LOKI_API_KEY=${GRAFANA_CLOUD_LOKI_API_KEY}
+
 networks:
   blog-network:
     driver: bridge
