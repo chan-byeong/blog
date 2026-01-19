@@ -4,7 +4,7 @@ import { LogLevel, LogSource, MiddlewareLogEntry } from './lib/log-schema';
 
 // Trace ID 생성 함수
 function generateTraceId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
 export function middleware(request: NextRequest) {
@@ -42,7 +42,7 @@ export function middleware(request: NextRequest) {
   const durationMs = Date.now() - startTime;
 
   // 응답 헤더에 메타데이터 추가
-  response.headers.set('X-Response-Time', `${durationMs}ms`);
+  response.headers.set('X-Middleware-Time', `${durationMs}ms`);
   response.headers.set('X-Trace-ID', traceId);
 
   // 응답 로깅 (비동기로 처리하여 성능 영향 최소화)

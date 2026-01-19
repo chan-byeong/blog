@@ -2,7 +2,7 @@ import { LogLevel, LogSource, ApplicationLogEntry } from './log-schema';
 
 // 요청 추적을 위한 trace ID 생성
 function generateTraceId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 }
 
 class UnifiedLogger {
@@ -35,11 +35,11 @@ class UnifiedLogger {
    * 통합 로그 작성
    */
   private writeLog(entry: ApplicationLogEntry): void {
-    // Trace ID 자동 추가
-    if (this.traceId) {
-      entry.trace_id = this.traceId;
-    }
-    const logLine = JSON.stringify(entry);
+    const logEntry = {
+      ...entry,
+      ...(this.traceId && { trace_id: this.traceId }),
+    };
+    const logLine = JSON.stringify(logEntry);
 
     if (typeof window === 'undefined') {
       console.log(logLine);
@@ -120,20 +120,3 @@ class UnifiedLogger {
 
 // 싱글톤 인스턴스
 export const logger = new UnifiedLogger();
-
-// 전역 에러 핸들러
-if (typeof window === 'undefined') {
-  process.on('uncaughtException', (error) => {
-    logger.error('Uncaught Exception', error, {
-      context: 'global_error_handler',
-    });
-    process.exit(1);
-  });
-
-  process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled Rejection', reason as Error, {
-      context: 'global_error_handler',
-      meta: { promise: promise.toString() },
-    });
-  });
-}

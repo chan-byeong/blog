@@ -77,9 +77,7 @@ export const NavBar = () => {
         active={false}
         onClick={() => {
           setTheme(theme === 'dark' ? 'light' : 'dark');
-          logger.info('Theme toggled', {
-            theme_name: theme === 'dark' ? 'light' : 'dark',
-          });
+          logger.info('Theme toggled');
         }}
         aria-label='theme toggle'
       />
