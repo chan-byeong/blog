@@ -19,6 +19,19 @@ APP_DIR="/home/ubuntu/blog"
 echo -e "${YELLOW}📂 Navigating to application directory...${NC}"
 cd $APP_DIR || exit 1
 
+echo -e "${YELLOW}🔍 Checking environment variables...${NC}"
+if [ ! -f .env ]; then
+    echo -e "${RED}❌ .env file not found!${NC}"
+    echo -e "${YELLOW}Please create .env file with Grafana Cloud credentials${NC}"
+    exit 1
+fi
+
+# Grafana Cloud 환경 변수 확인
+if ! grep -q "GRAFANA_CLOUD_LOKI_URL" .env; then
+    echo -e "${YELLOW}⚠️  Warning: GRAFANA_CLOUD_LOKI_URL not found in .env${NC}"
+    echo -e "${YELLOW}Promtail will not send logs to Grafana Cloud${NC}"
+fi
+
 echo -e "${YELLOW}📥 Pulling latest changes from Git...${NC}"
 git fetch origin
 git pull origin main
@@ -65,5 +78,33 @@ docker-compose ps
 echo -e "${YELLOW}📋 Recent logs:${NC}"
 docker-compose logs --tail=30
 
+# Promtail 상태 확인
+if docker-compose ps | grep -q "blog-promtail"; then
+    echo -e "${GREEN}✅ Promtail is running${NC}"
+    
+    # Promtail metrics 확인
+    if curl -s http://localhost:9080/metrics > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Promtail metrics endpoint is accessible${NC}"
+        
+        # 전송된 로그 수 확인
+        SENT_LOGS=$(curl -s http://localhost:9080/metrics | grep "promtail_sent_entries_total" | tail -1 | awk '{print $2}')
+        if [ ! -z "$SENT_LOGS" ]; then
+            echo -e "${GREEN}📊 Total logs sent to Grafana Cloud: ${SENT_LOGS}${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Promtail metrics endpoint not accessible${NC}"
+    fi
+    
+    # Promtail 에러 로그 확인
+    ERROR_COUNT=$(docker logs blog-promtail 2>&1 | grep -i "error" | wc -l)
+    if [ $ERROR_COUNT -gt 0 ]; then
+        echo -e "${YELLOW}⚠️  Promtail has $ERROR_COUNT error messages${NC}"
+        echo -e "${YELLOW}Check logs: docker logs blog-promtail${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  Promtail container not found${NC}"
+fi
+
 echo -e "${GREEN}✨ Deployment completed successfully!${NC}"
 echo -e "${GREEN}🌐 Visit: https://byeoung.dev${NC}"
+echo -e "${GREEN}📊 Grafana Cloud: https://grafana.com/orgs/your-org${NC}"
