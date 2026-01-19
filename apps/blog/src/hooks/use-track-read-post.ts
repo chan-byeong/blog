@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { trackReadPost } from '@/lib/analytics';
+import { logger } from '@/lib/unified-logger';
 
 interface UseTrackReadPostProps {
   slug: string;
@@ -23,7 +23,10 @@ export const useTrackReadPost = ({
     }
 
     const timer = setTimeout(() => {
-      trackReadPost(slug, title);
+      logger.info('Post read tracker triggered', {
+        post_slug: slug,
+        post_title: title,
+      });
       hasTracked.current = true;
     }, delayMs);
 
