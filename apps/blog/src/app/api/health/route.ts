@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/unified-logger';
 
-export async function GET(request: Request) {
+export async function GET(_request: Request) {
   try {
     // 헬스체크는 빈번하므로 DEBUG 레벨로 로깅
     logger.debug('Health check requested', {
