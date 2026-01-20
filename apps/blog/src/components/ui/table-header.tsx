@@ -13,7 +13,7 @@ export const TableHeader = ({
   return (
     <div
       className={cn(
-        'grid grid-cols-subgrid items-center border-b-[0.5px] pb-1.5 border-border bg-transparent self-start',
+        'border-border grid grid-cols-subgrid items-center self-start border-b-[0.5px] bg-transparent pb-1.5',
         className
       )}
       {...props}

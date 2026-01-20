@@ -6,7 +6,7 @@ interface TagProps extends React.HTMLAttributes<HTMLSpanElement> {
 export const Tag = ({ label, icon, ...props }: TagProps) => {
   return (
     <span
-      className='inline-flex gap-1.5 items-center bg-transparent px-1.5 py-1 text-sm font-medium text-primary hover:bg-muted-foreground/20 transition-colors '
+      className='text-primary hover:bg-muted-foreground/20 inline-flex items-center gap-1.5 bg-transparent px-1.5 py-1 text-sm font-medium transition-colors'
       {...props}
     >
       {icon}

@@ -57,12 +57,12 @@ export const PostSideBar = ({
   };
 
   return (
-    <div className='grid grid-cols-subgrid col-span-full'>
+    <div className='col-span-full grid grid-cols-subgrid'>
       <div
-        className={`hidden md:block grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`col-span-full hidden grid-cols-subgrid overflow-hidden transition-all duration-300 ease-in-out md:block ${
           isScrolledDown
-            ? 'max-h-[500px] opacity-100 translate-y-0'
-            : 'max-h-0 opacity-0 -translate-y-4'
+            ? 'max-h-[500px] translate-y-0 opacity-100'
+            : 'max-h-0 -translate-y-4 opacity-0'
         }`}
       >
         <PostHeader
@@ -74,29 +74,29 @@ export const PostSideBar = ({
         />
       </div>
 
-      <TableHeader className='hidden md:grid col-span-full'>
-        <span className='col-span-full text-primary text-xs font-semibold uppercase'>
+      <TableHeader className='col-span-full hidden md:grid'>
+        <span className='text-primary col-span-full text-xs font-semibold uppercase'>
           / Side
         </span>
       </TableHeader>
 
       <button
-        className='col-span-full cursor-pointer text-[15px] font-medium inline-flex self-start group items-center gap-x-2 hover:bg-muted-foreground/20 transition-colors my-2 mr-4 py-1 rounded-xs data-[state=closed]:text-primary/80'
+        className='group hover:bg-muted-foreground/20 data-[state=closed]:text-primary/80 col-span-full my-2 mr-4 inline-flex cursor-pointer items-center gap-x-2 self-start rounded-xs py-1 text-[15px] font-medium transition-colors'
         onClick={handleToggleToc}
         data-state={isTocVisible ? 'open' : 'closed'}
         aria-expanded={isTocVisible}
         aria-controls='toc-content'
       >
-        <i className='hn hn-angle-right transition-transform duration-200 group-data-[state=open]:rotate-90 fill-foreground dark:fill-foreground'></i>
+        <i className='hn hn-angle-right fill-foreground dark:fill-foreground transition-transform duration-200 group-data-[state=open]:rotate-90'></i>
         Table of Contents
       </button>
 
       <div
         id='toc-content'
-        className={`grid grid-cols-subgrid col-span-full overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`col-span-full grid grid-cols-subgrid overflow-hidden transition-all duration-300 ease-in-out ${
           isTocVisible
-            ? 'max-h-[1000px] opacity-100 translate-y-0'
-            : 'max-h-0 opacity-0 -translate-y-4'
+            ? 'max-h-[1000px] translate-y-0 opacity-100'
+            : 'max-h-0 -translate-y-4 opacity-0'
         }`}
       >
         <TableOfContents items={tocItems} />

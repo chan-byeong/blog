@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # Next.js 애플리케이션
+  nextjs:
+    container_name: blog-nextjs
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - blog-network
+    # 외부로 포트 노출하지 않음 (Nginx를 통해서만 접근)
+    expose:
+      - '3000'
+    # 로그 설정
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+        tag: '{{.Name}}'
+    # Next.js 로그 설정 (stdout 사용 권장)
+    # volumes:
+    #   - ./apps/blog/logs/nextjs:/app/apps/blog/logs
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx 리버스 프록시
+  nginx:
+    container_name: blog-nginx
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    # Nginx 로그 설정 (stdout 사용 권장)
+    # volumes:
+    #   - ./apps/blog/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    #   - ./apps/blog/nginx/ssl:/etc/nginx/ssl:ro
+    #   - ./apps/blog/nginx/logs:/var/log/nginx
+    volumes:
+      - ./apps/blog/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./apps/blog/nginx/ssl:/etc/nginx/ssl:ro
+    # 로그 설정
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '10'
+        tag: '{{.Name}}'
+    depends_on:
+      nextjs:
+        condition: service_healthy
+    networks:
+      - blog-network
+    healthcheck:
+      test: ['CMD', 'wget', '--quiet', '--tries=1', '--spider', 'http://localhost/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Promtail (로그 수집 → Grafana Cloud)
+  promtail:
+    container_name: blog-promtail
+    image: grafana/promtail:latest
+    restart: unless-stopped
+    volumes:
+      # Docker 컨테이너 로그 (stdout/stderr)
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Promtail 설정 파일
+      - ./promtail-grafana-cloud.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml -config.expand-env=true
+    networks:
+      - blog-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
+        tag: '{{.Name}}'
+    environment:
+      - LOKI_URL=${GRAFANA_CLOUD_LOKI_URL}
+      - LOKI_USER=${GRAFANA_CLOUD_LOKI_USER}
+      - LOKI_API_KEY=${GRAFANA_CLOUD_LOKI_API_KEY}
+
+networks:
+  blog-network:
+    driver: bridge
+
+# 선택사항: 로그 및 캐시 영속성을 위한 볼륨
+volumes:
+  nginx_logs:
+    driver: local

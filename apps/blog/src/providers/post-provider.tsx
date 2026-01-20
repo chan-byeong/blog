@@ -9,12 +9,15 @@ const PostStoreContext = createContext<PostStoreContextType | null>(null);
 
 const initializePostState = (initialState: PostState['posts']) => {
   const postCount = initialState.length;
-  const postCountByTags = initialState.reduce((acc, post) => {
-    post.tags?.forEach((tag) => {
-      acc[tag] = (acc[tag] || 0) + 1;
-    });
-    return acc;
-  }, {} as Record<string, number>);
+  const postCountByTags = initialState.reduce(
+    (acc, post) => {
+      post.tags?.forEach((tag) => {
+        acc[tag] = (acc[tag] || 0) + 1;
+      });
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return {
     posts: initialState,

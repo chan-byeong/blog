@@ -1,0 +1,75 @@
+# Dependencies
+node_modules
+**/node_modules
+npm-debug.log
+pnpm-debug.log*
+yarn-error.log*
+.pnpm-store
+
+# Build outputs
+.next
+**/\.next
+out
+dist
+build
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+.cursor
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Documentation
+README.md
+CHANGELOG.md
+RELEASE.md
+ROUTING.md
+*.md
+!apps/blog/content/**/*.mdx
+
+# Logs
+logs
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Misc
+.eslintcache
+.prettierignore
+.prettierrc
+
+# Nginx
+apps/blog/nginx/logs
+apps/blog/nginx/ssl/*.pem
+
+# Scripts
+apps/blog/scripts

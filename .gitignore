@@ -1,1 +1,8 @@
 node_modules
+.DS_Store
+
+# 로그 및 설정 파일
+apps/blog/nginx/ssl/*.pem
+apps/blog/nginx/logs/
+apps/blog/logs/
+*.log

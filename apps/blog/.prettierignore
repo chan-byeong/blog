@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+package-lock.json
+pnpm-lock.yaml
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Cache
+.turbo
+.cache
+
+# Environment
+.env
+.env.*
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+
+# Public assets
+public/fonts
+*.woff
+*.woff2
+*.ttf
+*.otf

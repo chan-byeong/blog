@@ -6,14 +6,16 @@ interface AccordionProps {
   children?: React.ReactNode;
 }
 
-interface AccordionTriggerProps
-  extends React.ComponentPropsWithRef<typeof RadixAccordion.Trigger> {
+interface AccordionTriggerProps extends React.ComponentPropsWithRef<
+  typeof RadixAccordion.Trigger
+> {
   children?: React.ReactNode;
   className?: string;
 }
 
-interface AccordionContentProps
-  extends React.ComponentPropsWithRef<typeof RadixAccordion.Content> {
+interface AccordionContentProps extends React.ComponentPropsWithRef<
+  typeof RadixAccordion.Content
+> {
   children?: React.ReactNode;
   className?: string;
 }
@@ -38,7 +40,7 @@ const AccordionTrigger = ({
     <RadixAccordion.Header>
       <RadixAccordion.Trigger
         className={cn(
-          'flex items-center gap-2 group w-full text-left',
+          'group flex w-full items-center gap-2 text-left',
           className
         )}
         {...props}
@@ -57,7 +59,7 @@ const AccordionContent = ({
   return (
     <RadixAccordion.Content
       className={cn(
-        'overflow-hidden data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp',
+        'data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden',
         className
       )}
       {...props}

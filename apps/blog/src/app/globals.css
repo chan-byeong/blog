@@ -123,6 +123,16 @@
   }
 }
 
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}
+
 /* Code Highlighting Styles */
 @layer components {
   /* highlight.js 기본 스타일 */
@@ -330,7 +340,7 @@
   }
 
   .prose :where(pre):not(:where([class~='not-prose'] *)) {
-    @apply bg-transparent p-0 my-6;
+    @apply my-6 bg-transparent p-0;
   }
 
   .prose :where(pre code):not(:where([class~='not-prose'] *)) {

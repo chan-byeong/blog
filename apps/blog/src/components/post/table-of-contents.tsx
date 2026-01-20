@@ -54,9 +54,9 @@ export function TableOfContents({ items }: TableOfContentsProps) {
   };
 
   return (
-    <nav className='block col-span-full self-start mt-2'>
+    <nav className='col-span-full mt-2 block self-start'>
       <div className='space-y-2'>
-        <ul className='space-y-2 border-l border-dotted border-border/50 ml-2 mb-2'>
+        <ul className='border-border/50 mb-2 ml-2 space-y-2 border-l border-dotted'>
           {items.map((item) => {
             const isActive = activeId === item.id;
             const paddingLeft = (item.level - 1) * 12 + 16;
@@ -65,7 +65,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
               <li key={item.id} style={{ paddingLeft: `${paddingLeft}px` }}>
                 <button
                   onClick={() => handleClick(item.id)}
-                  className={`cursor-pointer text-sm hover:text-foreground transition-colors text-left block w-full ${
+                  className={`hover:text-foreground block w-full cursor-pointer text-left text-sm transition-colors ${
                     isActive
                       ? 'text-primary font-medium'
                       : 'text-muted-foreground'

@@ -35,6 +35,7 @@ export const NavButton = ({
   active,
   onClick,
   className,
+  ...props
 }: NavButtonProps) => {
   const content = (
     <>
@@ -47,14 +48,24 @@ export const NavButton = ({
 
   if (href) {
     return (
-      <Link href={href} className={combinedClassName} onClick={onClick}>
+      <Link
+        href={href}
+        className={combinedClassName}
+        onClick={onClick}
+        {...props}
+      >
         {content}
       </Link>
     );
   }
 
   return (
-    <button type='button' className={combinedClassName} onClick={onClick}>
+    <button
+      type='button'
+      className={combinedClassName}
+      onClick={onClick}
+      {...props}
+    >
       {content}
     </button>
   );

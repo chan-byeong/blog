@@ -1,7 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Standalone 모드 활성화 (Docker 최적화)
+  output: 'standalone',
+
   async redirects() {
     return [
       {

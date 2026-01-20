@@ -56,7 +56,7 @@ const createPostSlice: StateCreator<PostStore, [], [], PostStore> = (
     getSelectedTags: () => {
       return get().selectedTags;
     },
-  } as PostStore);
+  }) as PostStore;
 
 export const createPostStore = (initialState: PostState) => {
   return createStore<PostStore>()((set, get, store) => ({
