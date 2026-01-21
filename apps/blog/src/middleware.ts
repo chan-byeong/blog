@@ -97,13 +97,7 @@ export function middleware(request: NextRequest) {
     is_prefetch: prefetch,
   };
 
-  // JSON 한 줄로 로깅 (Grafana Loki 수집)
-  // process.stdout.write 사용하여 로그 잘림 방지
-  if (typeof process !== 'undefined' && process.stdout) {
-    process.stdout.write(JSON.stringify(requestLog) + '\n');
-  } else {
-    console.log(JSON.stringify(requestLog));
-  }
+  console.log(JSON.stringify(requestLog));
 
   // 요청 헤더에 traceId 전달 (Application에서 사용)
   const requestHeaders = new Headers(request.headers);
