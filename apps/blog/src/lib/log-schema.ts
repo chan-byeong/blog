@@ -84,6 +84,17 @@ export interface NginxLogEntry extends UnifiedLogEntry {
 }
 
 /**
+ * UTM 파라미터 (마케팅 캠페인 추적)
+ */
+export interface UTMParams {
+  utm_source?: string; // 유입 소스 (google, facebook, newsletter)
+  utm_medium?: string; // 매체 (cpc, email, social)
+  utm_campaign?: string; // 캠페인 이름
+  utm_term?: string; // 검색 키워드
+  utm_content?: string; // 콘텐츠 구분 (A/B 테스트용)
+}
+
+/**
  * Middleware 로그 타입
  */
 export interface MiddlewareLogEntry extends UnifiedLogEntry {
@@ -91,6 +102,10 @@ export interface MiddlewareLogEntry extends UnifiedLogEntry {
   pathname?: string;
   search_params?: Record<string, string>;
   is_prefetch?: boolean; // Next.js prefetch 요청 여부
+  // === 유입 분석 ===
+  utm?: UTMParams; // UTM 파라미터
+  referrer_domain?: string; // Referer 도메인만 추출
+  traffic_source?: string; // 유입 채널 분류 (direct, organic, social, referral, campaign)
 }
 
 /**
