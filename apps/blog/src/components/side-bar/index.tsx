@@ -6,21 +6,20 @@ import { FilterGroup } from './filter-group';
 import { Header } from './header';
 
 export const SideBar = () => {
-  const { postCount, postCountByTags } = usePostStore(
+  const { postCount, postCountByTags, selectedTags } = usePostStore(
     useShallow((store) => ({
       postCount: store.postCount,
       postCountByTags: store.postCountByTags,
+      selectedTags: store.selectedTags,
     }))
   );
   return (
-    <div
-      className='
-    sticky sm:top-20 grid grid-rows-subgrid row-start-1 row-span-2 grid-cols-subgrid col-span-full md:col-span-5 gap-y-8 sm:gap-y-14 
-    bg-background/80 backdrop-blur-md
-    '
-    >
+    <div className='bg-background/80 sticky col-span-full row-span-2 row-start-1 grid grid-cols-subgrid grid-rows-subgrid gap-y-8 backdrop-blur-md sm:top-20 sm:gap-y-14 md:col-span-5'>
       <Header title='Blog' totalPosts={postCount} />
-      <FilterGroup filterItems={postCountByTags} />
+      <FilterGroup
+        filterItems={postCountByTags}
+        defaultSelectedTags={selectedTags}
+      />
     </div>
   );
 };
