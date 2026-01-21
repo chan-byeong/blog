@@ -6,3 +6,7 @@ apps/blog/nginx/ssl/*.pem
 apps/blog/nginx/logs/
 apps/blog/logs/
 *.log
+
+.claude/
+.agents/
+.cursor/
