@@ -90,6 +90,7 @@ export interface MiddlewareLogEntry extends UnifiedLogEntry {
   source: LogSource.MIDDLEWARE;
   pathname?: string;
   search_params?: Record<string, string>;
+  is_prefetch?: boolean; // Next.js prefetch 요청 여부
 }
 
 /**
