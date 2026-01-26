@@ -23,6 +23,7 @@ pnpm format:check # Check formatting
 ```
 
 Root-level shortcuts (from project root):
+
 ```bash
 pnpm dev          # Alias for apps/blog dev
 pnpm build        # Alias for apps/blog build
@@ -44,7 +45,6 @@ docker-compose build --no-cache # Full rebuild
 
 # Deployment scripts (from project root)
 bash apps/blog/scripts/deploy.sh       # Auto deploy
-bash apps/blog/scripts/health-check.sh # Health check
 ```
 
 ## Architecture
@@ -72,6 +72,7 @@ Content is managed through local MDX files with frontmatter. The system is desig
 **Content Location**: `apps/blog/content/posts/*.mdx`
 
 **MDX Structure**:
+
 ```markdown
 ---
 title: 'Post Title'
@@ -84,6 +85,7 @@ tags: ['tag1', 'tag2']
 ```
 
 **Key Files**:
+
 - `src/lib/posts.ts`: File system operations for MDX (getAllPosts, getPostBySlug, etc.)
 - `src/lib/mdx.ts`: MDX parsing with rehype/remark plugins (parseMDX, extractTOC)
 - `src/types/post.ts`: Post type definitions
@@ -95,8 +97,6 @@ tags: ['tag1', 'tag2']
 ```
 /                    → Home page (post list)
 /posts/[slug]        → Individual post detail
-/api/health          → Health check endpoint
-/api/logs            → Client-side log ingestion
 ```
 
 Dynamic routes use Static Generation with `generateStaticParams()`. Post slugs are derived from MDX filenames.
@@ -106,6 +106,7 @@ Dynamic routes use Static Generation with `generateStaticParams()`. Post slugs a
 **Server Component First**: All components are Server Components by default. Only add `'use client'` when interactivity is required (state, events, browser APIs).
 
 **Component Organization**:
+
 ```
 src/components/
 ├── footer/           # Footer components
@@ -117,6 +118,7 @@ src/components/
 ```
 
 **Layout System**: Uses CSS Grid layout defined in `src/app/layout.tsx`:
+
 - Mobile: 8 columns
 - Small: 16 columns
 - Medium+: 24 columns
@@ -127,6 +129,7 @@ src/components/
 The app uses a unified structured logging system (`src/lib/unified-logger.ts`) that outputs JSON logs to stdout. Logs are collected by Promtail and sent to Grafana Cloud.
 
 **Usage**:
+
 ```typescript
 import { logger } from '@/lib/unified-logger';
 
@@ -136,6 +139,7 @@ logger.createTraceId(); // Start request tracing
 ```
 
 **Important**: Never use `console.log()`. Always use the logger singleton which:
+
 - Outputs structured JSON to stdout (server) or /api/logs (client)
 - Supports trace IDs for request correlation
 - Prevents log truncation with `process.stdout.write()`
@@ -154,13 +158,10 @@ logger.createTraceId(); // Start request tracing
 **Multi-stage Build**: Optimized Dockerfile produces ~150MB final image with standalone Next.js output.
 
 **Services** (docker-compose.yml):
+
 - `nextjs`: Next.js app (port 3000, internal only)
 - `nginx`: Reverse proxy with SSL (ports 80, 443)
 - `promtail`: Log collection to Grafana Cloud
-
-**Health Checks**:
-- Next.js: `GET /api/health` (30s interval)
-- Nginx: `GET /health` (30s interval)
 
 **Log Management**: All services use JSON file logging driver with rotation (10m max size, 10 files).
 

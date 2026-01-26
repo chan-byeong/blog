@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 
 import { NavButton } from './nav-button';
 import { useTheme } from 'next-themes';
-import { logger } from '@/lib/unified-logger';
+import { userAnalytics } from '@/lib/user-analytics';
+import { EventType } from '@/types/event-type';
 
 const navItems = [
   { label: 'BLOG', href: '/', key: 'B' },
@@ -59,7 +60,7 @@ export const NavBar = () => {
                     {...(item.rel && { rel: item.rel })}
                     active={isActive}
                     onClick={() => {
-                      logger.info('NavButton clicked', {
+                      userAnalytics.track(EventType.CLICK_NAV_BUTTON, {
                         nav_button_label: item.label,
                       });
                     }}
@@ -77,7 +78,7 @@ export const NavBar = () => {
         active={false}
         onClick={() => {
           setTheme(theme === 'dark' ? 'light' : 'dark');
-          logger.info('Theme toggled');
+          userAnalytics.track(EventType.THEME_TOGGLED);
         }}
         aria-label='theme toggle'
       />

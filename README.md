@@ -142,8 +142,6 @@ docker-compose up -d
 # 자동 배포
 bash apps/blog/scripts/deploy.sh
 
-# 헬스체크
-bash apps/blog/scripts/health-check.sh
 ```
 
 ## 📚 기술 스택
