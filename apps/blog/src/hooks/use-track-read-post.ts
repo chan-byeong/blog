@@ -18,6 +18,10 @@ export const useTrackReadPost = ({
   const hasTracked = useRef(false);
 
   useEffect(() => {
+    hasTracked.current = false;
+  }, [slug]);
+
+  useEffect(() => {
     // 이미 추적했으면 중복 방지
     if (hasTracked.current) {
       return;
