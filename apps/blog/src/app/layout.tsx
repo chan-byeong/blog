@@ -8,6 +8,7 @@ import { ThemeProvider } from '../providers/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
 import { Footer } from '@/components/footer';
 import { GoogleAnalytics } from '@/components/google-analytics';
+import { CustomAnalytics } from '@/components/custom-analytics';
 import { siteMetadata } from '@/lib/metadata';
 
 const suit = localFont({
@@ -43,6 +44,7 @@ export default function RootLayout({
         </main>
         <Analytics />
         <GoogleAnalytics />
+        <CustomAnalytics />
       </body>
     </html>
   );
