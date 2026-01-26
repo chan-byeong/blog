@@ -12,6 +12,12 @@ function AnalyticsTracker() {
   // 초기 마운트에만 실행 (첫 방문 추적)
   useEffect(() => {
     const data: Record<string, string> = { pathname };
+    const hasVisited = sessionStorage.getItem('hasVisited');
+    if (hasVisited) {
+      return;
+    }
+
+    sessionStorage.setItem('hasVisited', 'true');
 
     // referrer가 있으면 추가
     if (document.referrer) {
