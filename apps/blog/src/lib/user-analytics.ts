@@ -139,7 +139,10 @@ class UserAnalytics {
       const events = [...this.queue];
       this.queue = [];
 
-      navigator.sendBeacon('/api/analytics', JSON.stringify({ events }));
+      const blob = new Blob([JSON.stringify({ events })], {
+        type: 'application/json',
+      });
+      navigator.sendBeacon('/api/analytics', blob);
     });
   }
 }
