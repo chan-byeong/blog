@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { EventType } from '@/types/event-type';
 
 const MAX_BODY_SIZE = 50 * 1024; // 50KB (배치 이벤트 허용)
 
 interface AnalyticsEvent {
-  event: string;
+  event: EventType;
   timestamp: string;
   session_id: string;
   [key: string]: unknown;
@@ -51,10 +52,17 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, received: body.events.length });
-  } catch {
+  } catch (error) {
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid JSON' },
+        { status: 400 }
+      );
+    }
+    console.error('Unknown error', error);
     return NextResponse.json(
-      { success: false, error: 'Invalid JSON' },
-      { status: 400 }
+      { success: false, error: 'Unknown error' },
+      { status: 500 }
     );
   }
 }
