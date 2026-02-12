@@ -46,7 +46,9 @@ export const ConsoleBody = ({
     >
       <div
         ref={logsContainerRef}
+        role='log'
         aria-label='console-logs'
+        aria-live='polite'
         className='min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-2 wrap-break-word [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
       >
         <pre className='text-[#e9e9e9]'>{asciiArt}</pre>

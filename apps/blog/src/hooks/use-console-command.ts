@@ -1,5 +1,5 @@
-import { useTheme } from 'next-themes';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 
 export const useConsoleCommand = () => {
   const [mode, setMode] = useState<'normal' | 'password'>('normal');
@@ -7,7 +7,7 @@ export const useConsoleCommand = () => {
 
   const parseInput = (input: string) => {
     const [command, options] = input.trim().split(/\s+/).filter(Boolean);
-    return [command.toLowerCase(), options];
+    return [command?.toLowerCase() ?? '', options];
   };
 
   const executeCommand = (input: string) => {
@@ -50,7 +50,7 @@ export const useConsoleCommand = () => {
           type: 'output',
           message: 'admin command requires -l or --login option',
         };
-      case 'pwd':
+      case 'pwd': {
         const pwd = options[0] ?? '';
         if (!pwd) {
           return { type: 'output', message: 'Password is required' };
@@ -60,6 +60,7 @@ export const useConsoleCommand = () => {
           type: 'output',
           message: 'admin login successful, redirecting to /admin...',
         };
+      }
       default:
         return {
           type: 'output',

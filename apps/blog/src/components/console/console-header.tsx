@@ -16,6 +16,7 @@ export const ConsoleHeader = ({
   return (
     <div
       aria-label='console-header'
+      role='region'
       className='flex cursor-grab items-center justify-between bg-transparent p-1 select-none active:cursor-grabbing'
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
