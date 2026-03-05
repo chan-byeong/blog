@@ -22,7 +22,7 @@ export const FilterGroup = ({
       <div className='col-span-full flex flex-col self-start'>
         <Accordion defaultValue='filters'>
           <Accordion.Trigger asChild={true}>
-            <TriggerButton>Tags</TriggerButton>
+            <TriggerButton>tags</TriggerButton>
           </Accordion.Trigger>
           <Accordion.Content>
             <div className='mt-2 ml-2.5 flex flex-col'>
