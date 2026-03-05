@@ -85,7 +85,7 @@ export default async function PostPage({ params }: PostPageProps) {
           )}
         </div>
         {/* 메인 컨텐츠 그리드 */}
-        <div className='col-span-full grid grid-cols-subgrid md:col-span-18 md:col-start-7'>
+        <div className='col-span-full mx-4 grid grid-cols-subgrid md:col-span-17 md:col-start-8'>
           <div className='col-span-full grid-cols-subgrid items-start'>
             <TableHeader className='col-span-full'>
               <span className='text-primary col-span-full text-xs font-semibold uppercase'>
