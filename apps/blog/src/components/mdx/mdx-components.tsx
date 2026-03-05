@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import type { MDXComponents as MDXComponentsType } from 'mdx/types';
 import { CodeBlock } from './code-block';
 import { Callout } from './callout';
@@ -217,14 +216,14 @@ export const MDXComponents: MDXComponentsType = {
   // 구분선
   hr: (props) => <hr className='border-border/40 my-8 border-t' {...props} />,
 
-  // 이미지
-  img: ({ src, alt, ...props }) => (
-    <Image
+  // 이미지 - 반응형
+  img: ({ src, alt }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={src}
-      alt={alt}
-      className='border-border/20 my-6 rounded-lg border object-cover shadow-sm'
+      alt={alt ?? ''}
       loading='lazy'
-      {...props}
+      className='border-border/20 my-6 h-auto w-full rounded-sm shadow-sm'
     />
   ),
   sup: ({ children, ...props }) => (
