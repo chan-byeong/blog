@@ -26,6 +26,7 @@
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
+  --color-accent-thick: var(--accent-thick);
   --color-muted-foreground: var(--muted-foreground);
   --color-muted: var(--muted);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -36,7 +37,9 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-text-color: var(--text-color);
   --radius-sm: calc(var(--radius) - 4px);
+  --color-h-color: var(--h-color);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
@@ -60,6 +63,7 @@
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.95 0.06 35); /* 피치 */
+  --accent-thick: oklch(91.758% 0.04503 43.825);
   --accent-foreground: oklch(0.45 0.18 35);
   --destructive: oklch(0.577 0.245 27.325);
   --border: #1e1e1e;
@@ -78,6 +82,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: #1e1e1e;
   --sidebar-ring: oklch(0.708 0 0);
+  --text-color: #333d4b;
+  --h-color: #191f28;
 }
 
 [data-theme='dark'] {
@@ -93,7 +99,8 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: #a1a1aa;
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.68 0.2 35);
+  --accent: oklch(0.95 0.06 35); /* 피치 */
+  --accent-thick: oklch(82.094% 0.1067 44.138);
   --accent-foreground: oklch(0.98 0.02 35);
   --destructive: oklch(0.704 0.191 22.216);
   --border: #d9d9d9;
@@ -112,6 +119,8 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --text-color: #ededed;
+  --h-color: #ededed;
 }
 
 @layer base {
@@ -131,6 +140,14 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+}
+
+@utility paper-texture-overlay {
+  background-image: url('/static/paper-texture-grayscale.webp');
+  background-blend-mode: multiply;
+  background-size: cover;
+  background-position: center;
+  filter: contrast(1.1);
 }
 
 /* Code Highlighting Styles */
@@ -153,7 +170,7 @@
   .hljs-selector-tag,
   .hljs-subst {
     color: #d73a49;
-    font-weight: bold;
+    font-weight: normal;
   }
 
   .hljs-number,
@@ -172,8 +189,8 @@
   .hljs-title,
   .hljs-section,
   .hljs-selector-id {
-    color: #6f42c1;
-    font-weight: bold;
+    color: #393c2e;
+    font-weight: medium;
   }
 
   .hljs-subst {
@@ -183,7 +200,7 @@
   .hljs-type,
   .hljs-class .hljs-title {
     color: #22863a;
-    font-weight: bold;
+    font-weight: medium;
   }
 
   .hljs-tag,
@@ -261,7 +278,7 @@
   [data-theme='dark'] .hljs-title,
   [data-theme='dark'] .hljs-section,
   [data-theme='dark'] .hljs-selector-id {
-    color: #d2a8ff;
+    color: #d6dba5;
   }
 
   [data-theme='dark'] .hljs-type,

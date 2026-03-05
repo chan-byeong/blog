@@ -43,7 +43,7 @@ export const FilterItem = ({
 
   return (
     <div
-      className='group flex cursor-pointer items-center gap-1'
+      className='group flex cursor-pointer items-center gap-1.5 px-0.5 py-1 md:gap-2.5'
       data-state={checkState ? 'checked' : 'unchecked'}
       onClick={() => handleCheckedChange(!checkState)}
       role='checkbox'
@@ -54,13 +54,13 @@ export const FilterItem = ({
         checked={checkState}
         onCheckedChange={handleCheckedChange}
         {...props}
-        className='mr-1 hidden md:block'
+        className='hidden md:flex'
       />
-      <span className='text-primary/80 group-hover:text-primary group-data-[state=checked]:text-primary text-sm font-medium transition-colors group-hover:font-semibold group-data-[state=checked]:font-semibold'>
+      <span className='text-muted-foreground group-hover:text-foreground group-data-[state=checked]:text-foreground text-sm tracking-wide transition-colors duration-200'>
         {label}
       </span>
-      <span className='text-primary/60 group-hover:text-primary/80 group-data-[state=checked]:text-primary/80 text-xs font-medium transition-colors group-hover:font-semibold group-data-[state=checked]:font-semibold'>
-        ({postsCount})
+      <span className='text-muted-foreground/50 group-hover:text-muted-foreground/80 group-data-[state=checked]:text-muted-foreground/80 font-mono text-xs transition-colors duration-200'>
+        {postsCount}
       </span>
     </div>
   );
