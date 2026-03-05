@@ -1,0 +1,169 @@
+---
+title: '제네릭 사용 시 `ComponentPropsWithRef`와 `ComponentPropsWithoutRef` 타입의 차이'
+description: '리액트의 `withRef`와 `withoutRef` 타입은 어떤 차이가 있을까? 이로인해 나타나는 현상은?'
+date: '2026-02-14'
+tags: ['typescript', 'react']
+---
+
+# 개요
+
+`Polymorphic` 컴포넌트를 구현 중 제네릭을 활용한 타입을 정의할 때 `ComponentPropsWithRef`를 통해 프롭 타입을 정의한 경우 `as` 엘리먼트에 대한 타입 추론이 이루어지지 않는다. (그냥 리터럴 타입 ex. string 으로 된다.)
+반면 `ComponentPropsWithoutRef`로 타입 정의 시 올바른 추론이 된다.
+
+아래 코드와 사진을 참고해보자.
+
+```tsx
+type PolymorphicPropsWithoutRef<T extends React.ElementType> = {
+  as?: T;
+} & React.ComponentPropsWithoutRef<T>;
+
+export type PolymorphicProps<T extends React.ElementType> = {
+  as?: T;
+} & React.ComponentPropsWithRef<T>;
+```
+
+<div className='mx-auto my-8 flex w-full max-w-4xl flex-col items-center gap-8 sm:flex-row sm:flex-wrap sm:justify-center'>
+  <img
+    src='/posts/no-type-infer.png'
+    alt='no-type-infer'
+    className='h-auto w-full max-w-full object-contain sm:min-w-0 sm:flex-1'
+  />
+  <img
+    src='/posts/yes-type-infer.png'
+    alt='yes-type-infer'
+    className='h-auto w-full max-w-full object-contain sm:min-w-0 sm:flex-1'
+  />
+</div>
+
+## 왜 이럴까?
+
+결론부터 이야기하자면 **제네릭과 조건부 타입으로 인해 타입 평가가 보류**되기 때문이다.
+
+그렇다는 이야기는 `withRef` 타입은 내부에 조건부 타입이 존재하고, `withoutRef`는 내부에 조건부 타입이 존재하지 않는다고 이해할 수 있겠다.
+
+우선 조건부 타입이란 무엇인지 알아보고, `withRef` 타입과 `withoutRef` 타입에 왜 이런 차이가 존재하는지 알아보자.
+
+## 조건부 타입이란?
+
+자바스크립트의 삼항연산자와 비슷한 형태와 기능을 가진다. 하지만 삼항연산자는 런타임에 값을 결정하지만 조건부 타입은 컴파일 시 타입을 결정한다.
+
+`SomeType extends OtherType ? TrueType : FalseType`
+
+`T extends U ? X : Y` => 타입 T가 U에 할당 가능하면 타입 X 아니면 타입 Y
+
+예시를 보면 이해가 더 빠른다.
+
+```typescript
+interface Animal {
+  live(): void;
+}
+interface Dog extends Animal {
+  woof(): void;
+}
+
+type Example1 = Dog extends Animal ? number : string;
+// type Example1 = number;
+```
+
+조건부 타입은 제네릭과 함께 사용하면 더욱 효과적이다. 예를 들어 여러 입력에 대한 타입 정의를 하나하나 오버로드할 필요를 줄인다.
+
+```typescript
+type NameOrId<T extends number | string> = T extends number
+  ? IdLabel
+  : NameLabel;
+
+function createLabel<T extends number | string>(idOrName: T): NameOrId<T> {
+  throw 'unimplemented';
+}
+
+let a = createLabel('typescript'); // type a: NameLabel
+let b = createLabel(2.8); // type b: IdLabel
+```
+
+## ref에 의해 타입 결정 방식이 달라지는 이유
+
+함수형 컴포넌트와 클래스형 컴포넌트에 따라 `ref` 결정 방식이 달라지기 때문에 `withRef`는 내부에 조건부 타입이 존재하는 것이다.
+
+- 클래스형 컴포넌트는 컴포넌트에 대한 인스턴스가 생성되어있기 때문에 `ref`는 해당 컴포넌트의 인스턴스를 가르킨다.
+- 함수형 컴포넌트/HTML 요소는 인스턴스를 생성하지 않는다. 따라서 `forwardRef`로 정의된 타입이나 DOM 요소를 직접 가르키게 된다. (React v19에서는 forawrdRef가 deprecated 되었다. `React.Ref<T>`로 ref 타입을 정한다.)
+
+`ComponentPropswithRef` 내부에서는 어떻게 함수형 컴포넌트와 클래스형 컴포넌트를 구분하고 있는지 보자.
+
+```typescript
+// ComponentPropsWithRef — 조건부 타입(conditional type)이 최상위에 존재
+type ComponentPropsWithRef<T extends ElementType> = T extends new (
+  props: infer P
+) => Component<any, any>
+  ? PropsWithoutRef<P> & RefAttributes<InstanceType<T>> // class component
+  : PropsWithRef<ComponentProps<T>>;
+```
+
+`T extends new ( props: infer P ) => Component<any, any>`라는 조건식이 있는데 여기서 `new`라는 키워드르 통해서 해당 컴포넌트가 클래스형인지 아닌지를 판단할 수 있다.
+
+## 조건부 타입으로 인한 평가 보류?
+
+앞서 미리 말한 결론에서 조건부 타입으로 인한 타입 평가의 보류 때문에 올바른 타입 추론이 되지 않는다고 말했다.
+
+그렇다면 어떤식으로 평가보류가 일어나는지 살펴보자.
+
+### 제네릭과 조건부 타입
+
+`T extends new (props: infer P) => Component<any, any> ? A : B` 라는 조건식을 해결하려면 T가 무엇인지 알아야하지만, T는 미확정된 상태이기 때문에
+해당 조건식을 해결할 수 없다. 그래서 타입스크립트는 해당 조건부 타입 전체를 미해결 상태 (deferred)로 남겨둔다.
+
+**그럼 왜 `ComponentPropsWithoutRef`는 잘 동작할까?**
+
+타입스크립트는 타입 추론은 역방향 매칭(unification)으로 작동한다.
+
+```typescript
+type PolymorphicPropsWithoutRef<T extends ElementType> = {
+  as?: T;
+} & ComponentPropsWithoutRef<T>;
+
+<Polymorphic as="a" ... />
+```
+
+여기서 타입스크립트는 `as="a"`를 보고, `as?: T -> "a" -> T = "a"` 를 역추론할 수 있다.
+
+이렇게 역추론이 가능한 이유는 `ComponentPropsWithoutRef<T>`는 조건부 타입이 존재하지 않기 때문에 앞선 `as?: T`에서 T를 보고 타입을 추론할 수 있다.
+
+즉, 쉽게 이야기하자면 `T 타입`과 `결과 타입`이 1:1 매칭이 된다.
+
+하지만 `withRef`의 경우는 조건부 타입이 존재한다. 내부에 조건부 타입이 존재하게 되면 내부 타입은 deferred된 상태이다.
+
+이렇게되면 `as?: T`에서 T를 보고 `ComponentPropsWithRef<T>` 타입을 추론하려고 해도 해당 타입의 내부 타입은 `deferred` 상태이기 때문에 추론이 불가능해진다.
+
+즉, `T 타입`과 `결과 타입`이 1:1 매칭이 되지 않기 때문에 T만 보고 타입 결정이 불가능하다.
+
+### 그럼 언제 조건부 타입이 Resolve 되는가?
+
+타입의 평가는 컴파일 과정에 이루어진다. 그렇다면 T가 무엇인지 결정되면 자연스레 Resolve되어야 하는거 아닌가?
+
+`<Polymorphic as='a' ... />` 작성 시점에 T는 'a'로 결정되었다. 게다가 'a'는 HTML 태그이기 때문에 인스턴스 또한 존재하지 않는다.
+
+그렇다면 이때 조건부 타입이 Resolve되고 올바른 attribute를 추천해줄 수 있는거 아닌가? 라고 생각했다.
+
+### 타입 Resolve과 타입 Inference의 차이와 간극
+
+나는 Resolve -> Inference로 생각했다. 타입 해소가 이루어지고 이에 따른 타입 추론을 제공한다고 생각했는데 반대이다.
+
+Inference -> Resolve로 진행된다. 그리고 Inference는 말그대로 추론일 뿐 정확성보다는 성능을 위해 단일 패스 (Single-Pass) 방식을 사용한다.
+
+단일 패스 방식은 위의 `### 그럼 언제 조건부 타입이 Resolve 되는가?`에서 언급한 것처럼 단계적인 추론 방식이 아니다. 이런식으로 단계적으로 수행하면 컴파일 성능이 떨어지기 때문에 컴파일러는 **동시**에 처리한다.
+즉, T와 props 타입을 동시에 추론하고 이때 props 타입이 unknown이면 넘긴다. (둘이 일치한다면 올바르게 추론해준다.)
+
+즉, 우리가 IDE에게 요구하는 타입 추론은 단일 패스 방식으로 이루어지기 때문에 확실한? 타입이 아니라면 추론을 하지 않는다.
+
+## 올바른 타입 추론을 위한 방법
+
+조건부 타입에 관련된 이야기가 길어졌다. 그럼 React v19에서 올바르게 `ref`를 가진 props의 제네릭 타입을 추론하기 위해서는 어떻게 할까?
+
+`ComponentPropsWithRef`를 쓰지 않고 조건부 타입을 피하면된다.
+
+```tsx
+type PolymorphicComponent<T extends React.ElementType> = {
+  as?: T;
+} & React.ComponentPropsWithoutRef<T> & { ref?: React.Ref<T> };
+```
+
+이런식으로 작성하면 어떨까? IDE에서도 적절한 attribute를 추천해준다.

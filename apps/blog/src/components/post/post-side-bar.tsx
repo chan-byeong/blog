@@ -81,7 +81,7 @@ export const PostSideBar = ({
       </TableHeader>
 
       <button
-        className='group hover:bg-muted-foreground/20 data-[state=closed]:text-primary/80 col-span-full my-2 mr-4 inline-flex cursor-pointer items-center gap-x-2 self-start rounded-xs py-1 text-[15px] font-medium transition-colors'
+        className='group hover:bg-accent/30 dark:hover:bg-accent dark:hover:text-secondary data-[state=closed]:text-primary/80 col-span-full my-2 mr-4 inline-flex cursor-pointer items-center gap-x-2 self-start rounded-xs py-1 text-[15px] font-medium transition-colors'
         onClick={handleToggleToc}
         data-state={isTocVisible ? 'open' : 'closed'}
         aria-expanded={isTocVisible}

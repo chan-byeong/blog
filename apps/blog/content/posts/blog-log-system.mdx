@@ -1,0 +1,289 @@
+---
+title: '블로그에 로그 시스템 적용하기 [1]'
+description: 'Vercel, GA4 대신 만들어보기'
+date: '2026-01-26'
+tags: ['Project', 'NextJs']
+---
+
+# 블로그 로그 시스템 구축하기 - 서버 사이드 로깅과 삽질의 기록
+
+개인 블로그를 운영하면서 "어떤 유저가 블로그를 방문할까" ,"이력서에 추가한 블로그 링크를 확인할까?"하는 궁금증이 생겼다.
+
+그래서 초기에는 `Vercel Analytics`와 `Google Analytics`을 추가하여 블로그와 방문한 사용자에 대한 정보를 얻으려 했다. 하지만 Vercel에서 제공하는 분석 도구는 `hobby`티어에서는 상당히 제한적인 정보만을 볼 수 있다. 특히 로그는 하루나 이틀 내의 로그만 확인할 수 있다. 그리고 `Google Analytics`는 내가 원하는 바에 비해 굉장히 복잡해서 사용하는데 어려움이 존재했고, 사용한다고 하더라도 내가 설정해둔 보고서를 확인하는데는 하루가 지나서 분석된 보고서를 확인할 수 있다는 불편함이 있었다.
+
+그래서 `Vercel`에 배포하던 블로그를 `AWS`를 통해 직접 배포하고 로그 데이터를 활용하여 직접 분석 도구를 제작하기로 결정했다.
+
+이 글은 그 과정에서 겪은 시행착오와 배운 점들을 정리한 기록이다.
+
+## 선 3줄 요약
+
+1. Nginx, Middleware(proxy), App에서 로그 출력하도록 설정
+2. Grafana cloud로 로그 분석
+3. 실패 (`prefetch` 고려 못 함, 서버 로그와 클라이언트 로그에 대한 구분을 제대로 못 함)
+
+## 현재 시스템의 로그 구조 파악하기
+
+로그 시스템을 구축하기 전에 먼저 현재 인프라에서 어떤 로그들이 발생하는지 파악했다.
+
+| 로그 타입         | 위치                    | 내용                                           |
+| ----------------- | ----------------------- | ---------------------------------------------- |
+| **Nginx Access**  | `nginx/logs/access.log` | 모든 HTTP 요청 (IP, URL, 상태 코드, 응답 시간) |
+| **Nginx Error**   | `nginx/logs/error.log`  | Nginx 서버 에러                                |
+| **Next.js App**   | `logs/nextjs/app.log`   | 애플리케이션 로그 (INFO, WARN, ERROR, DEBUG)   |
+| **Next.js Error** | `logs/nextjs/error.log` | 애플리케이션 에러만                            |
+| **Docker**        | Docker daemon           | 컨테이너 stdout/stderr                         |
+
+블로그 분석을 위해 수집하고 싶은 데이터는 다음과 같았다.
+
+| 카테고리  | 수집 항목                     | 설명                                             |
+| --------- | ----------------------------- | ------------------------------------------------ |
+| 기본 정보 | `timestamp`, `path`, `method` | 발생 시간, 접속 경로, 요청 방식                  |
+| 유입 경로 | `referrer`                    | 사용자가 어디를 거쳐 왔는지 (Google, Twitter 등) |
+| 유저 식별 | `sid`, `uid`                  | 신규 유저 여부를 판별하기 위한 세션 ID           |
+| 활동 지표 | `dwell_time`                  | 페이지에 머문 시간                               |
+| 기기 정보 | `ua`                          | 모바일/데스크탑 구분, 브라우저 정보              |
+
+## 로그 선별 기준 정하기
+
+모든 로그를 다 남기면 원하는 로그를 찾기 어렵고, 디스크 공간도 낭비된다. 어떤 로그를 남기고 어떤 로그를 제외할지 기준을 정했다.
+
+**제외할 로그:**
+
+- 정적 파일 요청 (JS, CSS, 이미지 파일)
+- Health Check 요청
+- 봇/크롤러 접근
+
+**남길 로그:**
+
+- 실제 페이지 접근 요청
+- API 요청
+- 에러 발생 시 상세 정보
+
+운영 환경에서는 `warn`이나 `error` 레벨의 로그만 남기도록 설정하는 것이 일반적이다.
+
+## 로그 설정
+
+Grafana는 json 형태의 로그 분석이 가능하기 때문에 콘솔 출력되는 로그를 같은 json 타입으로 통일시키기로 했다.
+
+`proxy (middleware)`와 `app`에서 공통적으로 사용할 수 있는 `unified-logger` 클래스를 구현하였다.
+
+위와 같이 기본적인 `interface`를 정의하고 `middleware`와 `app`에서 사용하는 것은 `extends`하여 사용하였다.
+
+클래스 내 `writeLog` 메서드를 구현하였고 해당 메서드 내부에서 `/logger` 라우터에 전송한다.
+
+<details>
+<summary>UnifiedLogEntry</summary>
+
+```typescript
+export interface UnifiedLogEntry {
+  // === 필수 공통 필드 ===
+  timestamp: string; // ISO 8601 형식
+  level: LogLevel; // 로그 레벨
+  source: LogSource; // 로그 소스
+
+  // === HTTP 요청 정보 ===
+  method?: string; // GET, POST, etc.
+  path?: string; // /posts/react-ssr
+  url?: string; // 전체 URL (Middleware용)
+  status?: number; // HTTP 상태 코드
+
+  // === 네트워크 정보 ===
+  ip?: string; // 클라이언트 IP
+  user_agent?: string; // User-Agent
+  referer?: string; // Referer
+
+  // === 성능 메트릭 ===
+  request_time?: number; // 전체 요청 처리 시간 (초)
+  duration_ms?: number; // 밀리초 단위 (Application용)
+
+  // === Upstream 정보 (Nginx 전용) ===
+  upstream_addr?: string;
+  upstream_status?: string;
+  upstream_response_time?: string;
+  upstream_connect_time?: string;
+  upstream_header_time?: string;
+
+  // === 인프라 정보 ===
+  host?: string; // 호스트명
+  protocol?: string; // HTTP/1.1, HTTP/2.0
+  ssl_protocol?: string; // TLSv1.3
+  ssl_cipher?: string;
+
+  // === 요청 추적 ===
+  trace_id?: string; // 분산 추적 ID
+  request_id?: string; // 요청 고유 ID
+
+  // === 애플리케이션 컨텍스트 ===
+  user_id?: string; // 로그인 사용자 ID
+  session_id?: string; // 세션 ID
+
+  // === 메시지 및 데이터 ===
+  message?: string; // 로그 메시지
+  error?: string; // 에러 메시지
+  stack?: string; // 스택 트레이스
+
+  // === 커스텀 데이터 ===
+  [key: string]: unknown;
+}
+```
+
+</details>
+
+### Nginx 로그 설정
+
+Nginx는 `access_log`와 `error_log`를 출력하며, `conf` 파일에서 로그 포맷을 커스터마이징할 수 있다.
+
+```nginx
+# 상세 로그 포맷 정의
+log_format detailed '$remote_addr - $remote_user [$time_local] '
+    '"$request" $status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent" '
+    'rt=$request_time uct="$upstream_connect_time" '
+    'uht="$upstream_header_time" urt="$upstream_response_time"';
+
+# 로그 설정
+access_log /var/log/nginx/access.log detailed;
+error_log /var/log/nginx/error.log warn;
+```
+
+현재 Next.js 애플리케이션은 Nginx를 통해서만 접근할 수 있다. `access_log`는 모든 HTTP 요청을 기록하고, `error_log`는 에러 발생 시에만 기록한다.
+
+## 로그 분석 도구 선택: Grafana Cloud
+
+처음에는 로그를 파일로 저장하고 Python으로 분석한 뒤 시각화하려 했다. 하지만 이 방식은 몇 가지 문제가 있었다.
+
+1. 로그 시스템에 너무 많은 시간 투자가 필요
+2. 로그 저장을 위한 DB나 EC2 용량 증설 필요
+3. 현재 EC2 용량이 매우 부족한 상황
+
+그래서 로그 분석 도구를 사용하기로 결정하고, 여러 후보를 비교했다.
+
+| 구분        | Umami (이벤트 중심)                 | Grafana Cloud (로그 중심)              |
+| ----------- | ----------------------------------- | -------------------------------------- |
+| 데이터 수집 | 브라우저 스크립트 실행 시 전송      | 서버 콘솔의 모든 텍스트 수집           |
+| 분석 대상   | 버튼 클릭, 페이지 뷰 등 정해진 액션 | 에러 로그, DB 쿼리 로그, Nginx 로그 등 |
+| 커스텀 로그 | 불가능 (서버 내부 로그 읽기 불가)   | 완벽 지원 (JSON 로그 전체 분석 가능)   |
+| 주요 목적   | 마케팅적 수치 (조회수, 이탈률)      | 기술적 모니터링 + 사용자 활동 추적     |
+
+Umami는 웹 분석 도구에 가깝고, 내가 원하는 커스텀 로그 분석 기능을 제공하지 않았다. **Grafana Cloud**를 선택한 이유는 다음과 같다.
+
+- EC2 용량이 부족해서 로그를 외부에서 관리하는 것이 유리
+- 커스텀 로그 분석이 가능
+- 추후 DB 연동이 필요하면 그때 추가해도 됨
+
+단점이라면 가장 가까운 리전이 일본이라는 점과 따로 대시보드를 구성하기 위해 `Grafana Query`를 학습해야한다.
+
+## Promtail 설정하기
+
+Grafana Cloud에 로그를 전송하기 위해 Promtail을 사용했다.
+
+Grafana에서는 Alloy라는 툴을 추천한다. Alloy는 서버의 로그 뿐 아니라 서버의 상태 정보도 함께 전송한다.
+
+나의 경우에는 서버의 상태는 안중에 없기에 docker-compose에 Promtail 서비스를 추가하여 사용하였다. Promtail은 로그만을 전송한다.
+
+**설정 시 주의 사항:**
+
+1. `.env` 파일의 환경변수를 사용할 때 `expand-env` 옵션 필요
+
+```yaml
+command: -config.file=/etc/promtail/config.yml -config.expand-env=true
+```
+
+2. API Key 발급 시 Scope 확인하기
+   - 처음 받은 API Key가 Read 전용이라 401 에러가 발생했다
+
+3. LOKI_URL 설정
+   - base URL 뒤에 `/loki/api/v1/push`를 추가해야 한다
+
+## 구현 후 발생한 문제들
+
+로그 시스템을 구현하고 나서 이상한 현상이 발생했다. 구글 검색을 통해 접속해서 단 하나의 포스트만 들어갔는데, 무수히 많은 로그가 뜨고 모든 포스트에 접속했다는 로그가 나타났다.
+
+```
+2026-01-20 18:13:36.116 info 14.35.79.49 /posts/react-ssr-with-aws
+2026-01-20 18:13:36.112 info 14.35.79.49 /posts/react-ssr-with-aws
+2026-01-20 18:13:36.106 info 14.35.79.49 /posts/javascript-module-bundler
+2026-01-20 18:13:36.102 info 14.35.79.49 /posts/javascript-module-bundler
+2026-01-20 18:13:36.097 info 14.35.79.49 /posts/javascript-module-bundler
+2026-01-20 18:13:35.996 info 14.35.79.49 /posts/2025-retrospective-7
+...
+```
+
+### 문제 1: 노이즈 로그 (Bot, Health Check)
+
+**원인:**
+
+- Health Check: AWS ELB나 모니터링 툴이 서버 상태를 확인하기 위해 주기적으로 호출
+- Bot: 검색 엔진뿐만 아니라 취약점을 스캔하는 악성 봇들이 무차별적으로 접근
+
+**해결책:**
+Nginx에서 봇과 Health Check 요청을 필터링하도록 설정했다.
+
+```nginx
+map $http_user_agent $is_bot {
+    default 0;
+    "~*bot|spider|crawl|slurp|HealthChecker" 1;
+}
+
+access_log /var/log/nginx/access.log json_format if=$not_bot;
+```
+
+### 문제 2: 한 번 접속 시 모든 포스트 로그가 찍히는 현상
+
+**원인:**
+Next.js의 Prefetch 기능 때문이었다. Next.js는 성능을 위해 `<Link>`로 구현된 페이지를 사용자가 방문하기 전에 미리 데이터를 받아오는 prefetch 작업을 수행한다.
+
+**해결책:**
+
+1. `<Link prefetch={false} />` 로 기능 끄기
+2. Prefetch 요청을 로그에서 필터링하기
+
+로깅을 위해 `prefetch` 기능을 끄는 것은 바보같은 일이다. 대신 `prefetch` 요청을 로그에서 필터링하는 방식을 택했다.
+
+Prefetch 요청은 특정 헤더를 가지고 있어서 이를 기반으로 필터링을 시도했다.
+
+```
+# Prefetch 요청의 특징
+- purpose: prefetch 헤더
+- sec-purpose: prefetch 헤더
+- next-router-prefetch: 1 헤더
+- RSC prefetch 패턴 (?_rsc=...)
+```
+
+하지만 **미들웨어에서 prefetch 필터링은 불가능**했다.
+
+브라우저에서 확인했을 경우 요청 헤더에 `prefetch`필드가 존재하지만, 미들웨어로 들어오는 요청에는 해당 필드가 존재하지 않는다.
+
+미들웨어에서 받는 요청은 `NextRequest` 타입으로, 브라우저가 보내는 원본 요청이 아닌 Next.js가 재가공한 것이다. 브라우저 요청에는 `Prefetch` 헤더가 있지만, `NextRequest`의 헤더에는 해당 필드가 존재하지 않았다.
+
+## 큰 착각을 깨달은 순간
+
+여기서 내가 엄청나게 큰 착각을 하고 있었다는 것을 깨달았다.
+
+나는 Nginx와 Middleware 로그로 사용자의 네트워크 요청을 분석하고, Application 로그로 사용자 이벤트를 추적하려고 했다. 하지만 **Next.js는 하이브리드 SPA**다.
+
+`<Link/>` 컴포넌트를 사용하면 Next.js는 해당 페이지에 방문하기 전에 Prefetch로 페이로드를 미리 받아둔다. 그리고 사용자가 실제로 이동할 때는 **서버에 네트워크 요청을 하지 않고 캐싱된 데이터를 사용**한다.
+
+즉, **Nginx와 Middleware 로그로는 사용자의 실제 활동을 정확히 분석할 수 없다**는 것이다.
+
+추가로 유저 식별을 위해 `trace_id`를 Nginx에서 생성해서 Middleware로 전달하려 했는데, 이 역시 제대로 전달되지 않았다. 한 명의 유저에 대해 일관된 `trace_id`를 얻지 못했다.
+
+## 결론: 서버 사이드 로그의 역할 재정의
+
+결국 Nginx와 Middleware 로그는 다음 용도로 활용하기로 했다.
+
+- HTTP 상태 코드 분포
+- 실시간 트래픽 모니터링
+- 응답 시간 분석
+- 에러 로그 분석
+- 유입 경로 분석
+
+**사용자의 실제 행동 추적은 클라이언트 사이드 로깅으로 수행해야 한다**는 결론에 도달했다.
+
+## 배운 점
+
+1. **목적에 맞는 도구를 사용하자**: 서버 로그는 서버 모니터링에, 사용자 행동 분석은 클라이언트 로깅에 적합하다.
+
+2. **작은 것부터 검증하자**: 대규모 시스템을 구축하기 전에 작은 단위로 테스트했다면 문제를 더 빨리 발견할 수 있었다.
+
+다음 글에서는 이러한 깨달음을 바탕으로 클라이언트 사이드 로깅 시스템을 어떻게 구현했는지 정리해보겠다.

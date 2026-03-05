@@ -18,10 +18,13 @@ const initializePostState = (initialState: PostState['posts']) => {
     },
     {} as Record<string, number>
   );
+  const tagsWithoutRetrospective = Array.from(
+    new Set(initialState.flatMap((post) => post.tags || []))
+  ).filter((tag) => tag !== '회고');
 
   return {
     posts: initialState,
-    selectedTags: [],
+    selectedTags: [...tagsWithoutRetrospective],
     postCount,
     postCountByTags,
   };

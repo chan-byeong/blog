@@ -7,7 +7,10 @@ import { useEffect, useState } from 'react';
 
 import { NavButton } from './nav-button';
 import { useTheme } from 'next-themes';
-import { logger } from '@/lib/unified-logger';
+import { userAnalytics } from '@/lib/user-analytics';
+import { EventType } from '@/types/event-type';
+import { Modal } from './modal';
+import { Console } from '../console';
 
 const navItems = [
   { label: 'BLOG', href: '/', key: 'B' },
@@ -59,7 +62,7 @@ export const NavBar = () => {
                     {...(item.rel && { rel: item.rel })}
                     active={isActive}
                     onClick={() => {
-                      logger.info('NavButton clicked', {
+                      userAnalytics.track(EventType.CLICK_NAV_BUTTON, {
                         nav_button_label: item.label,
                       });
                     }}
@@ -71,16 +74,24 @@ export const NavBar = () => {
         </NavigationMenu.Root>
       </div>
 
-      <NavButton
-        label={theme === 'dark' ? 'LIGHT' : 'DARK'}
-        shortcutKey={theme === 'dark' ? 'L' : 'D'}
-        active={false}
-        onClick={() => {
-          setTheme(theme === 'dark' ? 'light' : 'dark');
-          logger.info('Theme toggled');
-        }}
-        aria-label='theme toggle'
-      />
+      <div className='flex items-center gap-1'>
+        <NavButton
+          label={theme === 'dark' ? 'LIGHT' : 'DARK'}
+          shortcutKey={theme === 'dark' ? 'L' : 'D'}
+          active={false}
+          onClick={() => {
+            setTheme(theme === 'dark' ? 'light' : 'dark');
+            userAnalytics.track(EventType.THEME_TOGGLED);
+          }}
+          aria-label='theme toggle'
+        />
+        <Modal
+          trigger={<NavButton label='CONSOLE' shortcutKey='C' active={false} />}
+          content={<Console />}
+          title='CONSOLE'
+          description='console is a tool that allows you to interact with the console'
+        />
+      </div>
     </nav>
   );
 };

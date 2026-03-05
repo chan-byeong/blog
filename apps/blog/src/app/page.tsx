@@ -8,8 +8,8 @@ export default async function Home() {
 
   return (
     <PostStoreProvider initialState={posts}>
-      <div className='grid grid-cols-subgrid col-span-full min-h-[calc(100dvh-41px)]'>
-        <section className='grid grid-cols-subgrid self-start col-span-full pt-10 md:pt-20 gap-y-8 md:gap-y-14 items-start'>
+      <div className='col-span-full grid min-h-[calc(100dvh-41px)] grid-cols-subgrid'>
+        <section className='col-span-full grid grid-cols-subgrid items-start gap-y-8 self-start pt-10 md:gap-y-14 md:pt-20'>
           <SideBar />
           <PostsSection />
         </section>

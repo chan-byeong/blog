@@ -8,6 +8,7 @@ import { ThemeProvider } from '../providers/theme-provider';
 import { NavBar } from '@/components/ui/nav-bar';
 import { Footer } from '@/components/footer';
 import { GoogleAnalytics } from '@/components/google-analytics';
+import { CustomAnalytics } from '@/components/custom-analytics';
 import { siteMetadata } from '@/lib/metadata';
 
 const suit = localFont({
@@ -32,9 +33,9 @@ export default function RootLayout({
   return (
     <html lang='ko' suppressHydrationWarning>
       <body
-        className={`${suit.variable} ${inter.variable} font-suit bg-background selection:bg-accent antialiased`}
+        className={`${suit.variable} ${inter.variable} font-suit bg-background selection:bg-accent dark:selection:text-secondary antialiased`}
       >
-        <main className='mx-auto grid min-h-dvh w-full max-w-7xl grid-flow-row auto-rows-auto grid-cols-8 items-start gap-0 px-2 sm:grid-cols-[repeat(16,1fr)] md:grid-cols-[repeat(24,1fr)] md:px-6'>
+        <main className='mx-auto grid min-h-dvh w-full max-w-6xl grid-flow-row auto-rows-auto grid-cols-8 items-start gap-0 px-2 sm:grid-cols-[repeat(16,1fr)] md:grid-cols-[repeat(24,1fr)] md:px-6'>
           <ThemeProvider>
             <NavBar />
             {children}
@@ -43,6 +44,7 @@ export default function RootLayout({
         </main>
         <Analytics />
         <GoogleAnalytics />
+        <CustomAnalytics />
       </body>
     </html>
   );
