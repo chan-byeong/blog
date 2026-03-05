@@ -2,7 +2,6 @@ import Image from 'next/image';
 import type { MDXComponents as MDXComponentsType } from 'mdx/types';
 import { CodeBlock } from './code-block';
 import { Callout } from './callout';
-import { Ref } from './ref';
 import { FootnoteTooltip } from './footnote-tooltip';
 
 /**
@@ -261,5 +260,4 @@ export const MDXComponents: MDXComponentsType = {
   // 커스텀 컴포넌트
   CodeBlock,
   Callout,
-  Ref,
 };
