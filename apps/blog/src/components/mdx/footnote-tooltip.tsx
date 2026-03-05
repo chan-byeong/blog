@@ -52,10 +52,10 @@ export function FootnoteTooltip({
           <Tooltip.Portal>
             <Tooltip.Content
               sideOffset={5}
-              className='animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-w-xs rounded-md border border-zinc-200 bg-white p-3 text-sm leading-relaxed break-keep whitespace-normal text-zinc-800 shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200'
+              // className='animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-w-xs rounded-sm border border-zinc-200 bg-white p-3 text-sm leading-relaxed break-keep whitespace-normal text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200'
+              className='max-w-sm rounded-xs bg-zinc-100 px-2 py-0.5 wrap-break-word dark:bg-zinc-800 dark:text-zinc-200'
             >
               {text}
-              <Tooltip.Arrow className='fill-white dark:fill-zinc-900' />
             </Tooltip.Content>
           </Tooltip.Portal>
         )}
