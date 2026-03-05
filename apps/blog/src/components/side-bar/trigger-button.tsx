@@ -15,7 +15,7 @@ export const TriggerButton = ({
     <button
       ref={ref}
       className={cn(
-        'hover:bg-muted-foreground/20 cursor-pointer rounded-sm p-1 transition-colors',
+        'group hover:bg-accent/30 cursor-pointer rounded-sm p-1 transition-colors',
         className
       )}
       {...props}
@@ -24,14 +24,14 @@ export const TriggerButton = ({
 
       <div>
         {/* 라이트모드: 닫힘, 열림 아이콘 */}
-        <i className='hn hn-folder-solid inline-block group-data-[state=open]:hidden dark:hidden' />
-        <i className='hn hn-folder-open-solid hidden group-data-[state=open]:inline-block dark:hidden' />
+        <i className='hn hn-folder inline-block group-data-[state=open]:hidden dark:hidden' />
+        <i className='hn hn-folder-open hidden group-data-[state=open]:inline-block dark:hidden' />
 
         {/* 다크모드: 닫힘, 열림 아이콘 */}
         <i className='hn hn-folder hidden dark:inline-block dark:group-data-[state=open]:hidden' />
         <i className='hn hn-folder-open hidden dark:group-data-[state=open]:inline-block' />
       </div>
-      <span className='text-primary/80 group-data-[state=open]:text-primary text-[15px] font-medium group-data-[state=open]:font-semibold'>
+      <span className='text-primary/80 group-data-[state=open]:text-primary text-[15px] font-medium group-hover:font-bold group-data-[state=open]:font-medium'>
         {children}
       </span>
     </button>
