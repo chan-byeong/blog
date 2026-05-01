@@ -22,7 +22,7 @@ cd $APP_DIR || exit 1
 echo -e "${YELLOW}🔍 Checking environment variables...${NC}"
 if [ ! -f .env ]; then
     echo -e "${RED}❌ .env file not found!${NC}"
-    echo -e "${YELLOW}Please create .env file with Grafana Cloud credentials${NC}"
+    echo -e "${YELLOW}Please create .env file from .env.example with deployment secrets${NC}"
     exit 1
 fi
 
@@ -31,6 +31,14 @@ if ! grep -q "GRAFANA_CLOUD_LOKI_URL" .env; then
     echo -e "${YELLOW}⚠️  Warning: GRAFANA_CLOUD_LOKI_URL not found in .env${NC}"
     echo -e "${YELLOW}Promtail will not send logs to Grafana Cloud${NC}"
 fi
+
+# GitHub 콘텐츠 저장소 환경 변수 확인
+for VAR_NAME in GITHUB_CONTENT_OWNER GITHUB_CONTENT_REPO GITHUB_CONTENT_BRANCH GITHUB_CONTENT_TOKEN GITHUB_WEBHOOK_SECRET; do
+    if ! grep -q "^${VAR_NAME}=" .env; then
+        echo -e "${YELLOW}⚠️  Warning: ${VAR_NAME} not found in .env${NC}"
+        echo -e "${YELLOW}GitHub content repository integration may not work${NC}"
+    fi
+done
 
 echo -e "${YELLOW}📥 Pulling latest changes from Git...${NC}"
 git fetch origin

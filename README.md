@@ -157,12 +157,25 @@ bash apps/blog/scripts/deploy.sh
 
 ## 🔐 환경 변수
 
-필요한 경우 `.env.production` 파일 생성:
+로컬 개발은 `apps/blog/.env.example`을 `apps/blog/.env.local`로 복사해
+사용합니다. Docker 배포는 프로젝트 루트의 `.env.example`을 `.env`로
+복사한 뒤 실제 값을 채웁니다. 실제 secret 값은 커밋하지 않습니다.
 
 ```env
 NODE_ENV=production
 NEXT_PUBLIC_SITE_URL=https://byeoung.dev
+GITHUB_CONTENT_OWNER=
+GITHUB_CONTENT_REPO=
+GITHUB_CONTENT_BRANCH=main
+GITHUB_CONTENT_TOKEN=
+GITHUB_WEBHOOK_SECRET=
 ```
+
+GitHub 콘텐츠 저장소 변수는 서버 런타임에서만 사용합니다.
+`GITHUB_CONTENT_TOKEN`은 콘텐츠 저장소를 읽을 수 있는 최소 권한 토큰이고,
+`GITHUB_WEBHOOK_SECRET`은 GitHub webhook의 secret 값과 같아야 합니다.
+Docker 배포에서는 `docker-compose.yml`의 `nextjs` 서비스가 루트 `.env`
+파일 값을 컨테이너 런타임 환경 변수로 주입합니다.
 
 ## 📝 문서
 

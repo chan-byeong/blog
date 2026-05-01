@@ -1,12 +1,14 @@
+import { cacheLife, cacheTag } from 'next/cache';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getPostBySlug, getAllPostSlugs } from '../../../lib/posts';
 import { parseMDX, extractTOC } from '../../../lib/mdx';
 import { PostHeader } from '../../../components/post/post-header';
 import { PostContent } from '../../../components/post/post-content';
-import type { Metadata } from 'next';
 import { PostSideBar } from '@/components/post/post-side-bar';
 import { TableHeader } from '@/components/ui/table-header';
 import { PostReadTracker } from '@/components/post/post-read-tracker';
+import { getPostCacheTag } from '@/lib/post-cache-tags';
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -44,8 +46,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function PostPage({ params }: PostPageProps) {
-  const { slug } = await params;
+async function CachedPostPage({ slug }: { slug: string }) {
+  'use cache';
+  cacheLife('days');
+  cacheTag(getPostCacheTag(slug));
+
   const post = await getPostBySlug(slug);
 
   if (!post) {
@@ -100,4 +105,10 @@ export default async function PostPage({ params }: PostPageProps) {
       </section>
     </div>
   );
+}
+
+export default async function PostPage({ params }: PostPageProps) {
+  const { slug } = await params;
+
+  return <CachedPostPage slug={slug} />;
 }

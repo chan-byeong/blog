@@ -89,8 +89,8 @@ function getPostMetadata(
   slug: string,
   data: Record<string, unknown>
 ): PostMetadata {
-  assertStringField(slug, data, 'title');
-  assertStringField(slug, data, 'description');
+  const title = getStringField(slug, data, 'title');
+  const description = getStringField(slug, data, 'description');
 
   if (data.tags !== undefined && !isStringArray(data.tags)) {
     throw new Error(
@@ -111,22 +111,36 @@ function getPostMetadata(
   }
 
   return {
-    ...(data as PostMetadata),
+    title,
+    description,
     date,
+    ...(data.tags !== undefined ? { tags: data.tags } : {}),
+    ...(typeof data.author === 'string' ? { author: data.author } : {}),
+    ...(typeof data.image === 'string' ? { image: data.image } : {}),
+    ...(typeof data.coverImage === 'string'
+      ? { coverImage: data.coverImage }
+      : {}),
+    ...(typeof data.published === 'boolean'
+      ? { published: data.published }
+      : {}),
     ...(updatedAt !== undefined ? { updatedAt } : {}),
   };
 }
 
-function assertStringField(
+function getStringField(
   slug: string,
   data: Record<string, unknown>,
-  fieldName: 'title' | 'description' | 'date'
-): asserts data is Record<typeof fieldName, string> {
-  if (typeof data[fieldName] !== 'string') {
+  fieldName: 'title' | 'description'
+): string {
+  const value = data[fieldName];
+
+  if (typeof value !== 'string') {
     throw new Error(
       `Invalid frontmatter for post "${slug}": ${fieldName} must be a string.`
     );
   }
+
+  return value;
 }
 
 function isStringArray(value: unknown): value is string[] {

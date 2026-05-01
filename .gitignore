@@ -1,5 +1,9 @@
 node_modules
 .DS_Store
+.env
+.env.*
+!.env.example
+!apps/blog/.env.example
 
 # 로그 및 설정 파일
 apps/blog/nginx/ssl/*.pem

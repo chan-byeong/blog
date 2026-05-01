@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 import '@hackernoon/pixel-icon-library/fonts/iconfont.css';
 import './globals.css';
@@ -37,9 +38,11 @@ export default function RootLayout({
       >
         <main className='mx-auto grid min-h-dvh w-full max-w-6xl grid-flow-row auto-rows-auto grid-cols-8 items-start gap-0 px-2 sm:grid-cols-[repeat(16,1fr)] md:grid-cols-[repeat(24,1fr)] md:px-6'>
           <ThemeProvider>
-            <NavBar />
-            {children}
-            <Footer />
+            <Suspense fallback={null}>
+              <NavBar />
+              {children}
+              <Footer />
+            </Suspense>
           </ThemeProvider>
         </main>
         <Analytics />

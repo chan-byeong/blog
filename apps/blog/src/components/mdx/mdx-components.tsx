@@ -217,13 +217,14 @@ export const MDXComponents: MDXComponentsType = {
   hr: (props) => <hr className='border-border/40 my-8 border-t' {...props} />,
 
   // 이미지 - 반응형
-  img: ({ src, alt }) => (
+  img: ({ src, alt, ...props }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={src}
       alt={alt ?? ''}
       loading='lazy'
       className='border-border/20 my-6 h-auto w-full rounded-sm shadow-sm'
+      {...props}
     />
   ),
   sup: ({ children, ...props }) => (

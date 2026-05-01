@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { Octokit } from '@octokit/rest';
+import { cacheLife, cacheTag } from 'next/cache';
 import type {
   GitHubContentConfig,
   GitHubContentItem,
@@ -20,10 +21,12 @@ const DEFAULT_BRANCH = 'main';
 const POST_FILE_EXTENSIONS = ['.mdx', '.md'] as const;
 
 export async function getPostSlugs(): Promise<string[]> {
+  'use cache';
+  cacheLife('days');
+  cacheTag(POSTS_CACHE_TAG);
+
   const config = getGitHubContentConfig();
-  const payload = await fetchGitHubContent(config, POSTS_DIRECTORY, [
-    POSTS_CACHE_TAG,
-  ]);
+  const payload = await fetchGitHubContent(config, POSTS_DIRECTORY);
 
   if (!Array.isArray(payload)) {
     throw new GitHubContentError(
@@ -40,6 +43,10 @@ export async function getPostSlugs(): Promise<string[]> {
 export async function getPostSourceBySlug(
   slug: string
 ): Promise<string | null> {
+  'use cache';
+  cacheLife('days');
+  cacheTag(getPostCacheTag(slug));
+
   const config = getGitHubContentConfig();
   const payload = await fetchPostContentBySlug(config, slug);
 
@@ -57,6 +64,10 @@ export async function getPostSourceBySlug(
 }
 
 export async function getAllPostSources(): Promise<PostSource[]> {
+  'use cache';
+  cacheLife('days');
+  cacheTag(POSTS_CACHE_TAG);
+
   const slugs = await getPostSlugs();
   const sources = await Promise.all(
     slugs.map(async (slug) => ({
@@ -102,22 +113,19 @@ function getGitHubContentConfig(): GitHubContentConfig {
 function fetchGitHubContent(
   config: GitHubContentConfig,
   path: string,
-  tags: string[],
   options?: { allowNotFound?: false }
 ): Promise<unknown>;
 function fetchGitHubContent(
   config: GitHubContentConfig,
   path: string,
-  tags: string[],
   options: { allowNotFound: true }
 ): Promise<unknown | null>;
 async function fetchGitHubContent(
   config: GitHubContentConfig,
   path: string,
-  tags: string[],
   options: { allowNotFound?: boolean } = {}
 ): Promise<unknown | null> {
-  const octokit = createOctokit(config, tags);
+  const octokit = createOctokit(config);
 
   try {
     const response = await octokit.repos.getContent({
@@ -145,16 +153,9 @@ async function fetchGitHubContent(
   }
 }
 
-function createOctokit(config: GitHubContentConfig, tags: string[]): Octokit {
+function createOctokit(config: GitHubContentConfig): Octokit {
   return new Octokit({
     ...(config.token ? { auth: config.token } : {}),
-    request: {
-      fetch: (url: RequestInfo | URL, options?: RequestInit) =>
-        fetch(url, {
-          ...options,
-          next: { tags },
-        } as RequestInit & { next: { tags: string[] } }),
-    },
   });
 }
 
@@ -166,7 +167,6 @@ async function fetchPostContentBySlug(
     const payload = await fetchGitHubContent(
       config,
       `${POSTS_DIRECTORY}/${slug}${extension}`,
-      [getPostCacheTag(slug)],
       { allowNotFound: true }
     );
 
