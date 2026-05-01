@@ -15,7 +15,7 @@ type PostSource = {
 };
 
 const LOCAL_POSTS_DIRECTORY = path.join(process.cwd(), 'content', 'posts');
-const POST_FILE_EXTENSIONS = ['.mdx', '.md'] as const;
+const POST_FILE_EXTENSIONS = ['.md', '.mdx'] as const;
 
 /**
  * 모든 포스트의 메타데이터를 가져옵니다.

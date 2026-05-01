@@ -18,7 +18,7 @@ import { POSTS_CACHE_TAG, getPostCacheTag } from './post-cache-tags';
 const GITHUB_API_VERSION = '2022-11-28';
 const POSTS_DIRECTORY = 'posts';
 const DEFAULT_BRANCH = 'main';
-const POST_FILE_EXTENSIONS = ['.mdx', '.md'] as const;
+const POST_FILE_EXTENSIONS = ['.md', '.mdx'] as const;
 
 export function hasGitHubContentConfig(): boolean {
   return Boolean(
@@ -75,12 +75,13 @@ export async function getAllPostSources(): Promise<PostSource[]> {
   cacheLife('days');
   cacheTag(POSTS_CACHE_TAG);
 
-  const slugs = await getPostSlugs();
+  const postItems = await getPostItems();
   const sources = await Promise.all(
-    slugs.map(async (slug) => ({
-      slug,
-      source: await getPostSourceBySlug(slug),
-    }))
+    postItems.map(async ({ slug, path }) => {
+      const source = await getPostSourceByPath(path);
+
+      return { slug, source };
+    })
   );
 
   return sources
@@ -89,6 +90,25 @@ export async function getAllPostSources(): Promise<PostSource[]> {
         postSource.source !== null
     )
     .map(({ slug, source }) => ({ slug, source }));
+}
+
+async function getPostItems(): Promise<Array<{ slug: string; path: string }>> {
+  const config = getGitHubContentConfig();
+  const payload = await fetchGitHubContent(config, POSTS_DIRECTORY);
+
+  if (!Array.isArray(payload)) {
+    throw new GitHubContentError(
+      'Expected GitHub posts directory response to be an array.'
+    );
+  }
+
+  return payload
+    .filter(isGitHubContentItem)
+    .filter((item) => item.type === 'file' && isPostFileName(item.name))
+    .map((item) => ({
+      slug: getSlugFromPostFileName(item.name),
+      path: item.path,
+    }));
 }
 
 function getGitHubContentConfig(): GitHubContentConfig {
@@ -185,13 +205,34 @@ async function fetchPostContentBySlug(
   return null;
 }
 
+async function getPostSourceByPath(path: string): Promise<string | null> {
+  const config = getGitHubContentConfig();
+  const payload = await fetchGitHubContent(config, path, {
+    allowNotFound: true,
+  });
+
+  if (payload === null) {
+    return null;
+  }
+
+  if (!isGitHubFileContent(payload)) {
+    throw new GitHubContentError(
+      `Expected GitHub post "${path}" response to be a base64 file.`
+    );
+  }
+
+  return decodeBase64Content(payload.content);
+}
+
 function isGitHubContentItem(value: unknown): value is GitHubContentItem {
   return (
     typeof value === 'object' &&
     value !== null &&
     'name' in value &&
+    'path' in value &&
     'type' in value &&
     typeof value.name === 'string' &&
+    typeof value.path === 'string' &&
     typeof value.type === 'string'
   );
 }
