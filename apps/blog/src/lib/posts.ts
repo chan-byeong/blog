@@ -1,34 +1,18 @@
-import fs from 'fs';
-import path from 'path';
 import matter from 'gray-matter';
-import type { Post, PostMetadata } from '../types/post';
+import { getAllPostSources, getPostSourceBySlug } from './github-content';
+import type { Post, PostMetadata } from '@/types/post';
 
-const postsDirectory = path.join(process.cwd(), 'content', 'posts');
+type ParsedPost = Post | null;
 
 /**
  * 모든 포스트의 메타데이터를 가져옵니다.
  * 향후 CMS로 마이그레이션 시 이 함수만 수정하면 됩니다.
  */
 export async function getAllPosts(): Promise<Post[]> {
-  if (!fs.existsSync(postsDirectory)) {
-    return [];
-  }
-
-  const fileNames = fs.readdirSync(postsDirectory);
-  const allPostsData = fileNames
-    .filter((fileName) => fileName.endsWith('.mdx'))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, '');
-      const fullPath = path.join(postsDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data, content } = matter(fileContents);
-
-      return {
-        slug,
-        content,
-        ...(data as PostMetadata),
-      } as Post;
-    });
+  const postSources = await getAllPostSources();
+  const allPostsData = postSources
+    .map(({ slug, source }) => parsePostSource(slug, source))
+    .filter((post): post is Post => post !== null);
 
   // 날짜순으로 정렬 (최신순)
   return allPostsData.sort((a, b) => {
@@ -44,19 +28,14 @@ export async function getAllPosts(): Promise<Post[]> {
  * 특정 slug의 포스트를 가져옵니다.
  */
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  try {
-    const fullPath = path.join(postsDirectory, `${slug}.mdx`);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
+  const normalizedSlug = decodePostSlug(slug);
+  const source = await getPostSourceBySlug(normalizedSlug);
 
-    return {
-      slug,
-      content,
-      ...(data as PostMetadata),
-    } as Post;
-  } catch (error) {
+  if (source === null) {
     return null;
   }
+
+  return parsePostSource(normalizedSlug, source);
 }
 
 /**
@@ -64,14 +43,8 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
  * 정적 생성(Static Generation)에 사용됩니다.
  */
 export async function getAllPostSlugs(): Promise<string[]> {
-  if (!fs.existsSync(postsDirectory)) {
-    return [];
-  }
-
-  const fileNames = fs.readdirSync(postsDirectory);
-  return fileNames
-    .filter((fileName) => fileName.endsWith('.mdx'))
-    .map((fileName) => fileName.replace(/\.mdx$/, ''));
+  const allPosts = await getAllPosts();
+  return allPosts.map((post) => post.slug);
 }
 
 /**
@@ -94,4 +67,96 @@ export async function getAllTags(): Promise<string[]> {
   });
 
   return Array.from(tagsSet).sort();
+}
+
+function parsePostSource(slug: string, source: string): ParsedPost {
+  const { data, content } = matter(source);
+
+  if (data.published === false) {
+    return null;
+  }
+
+  const metadata = getPostMetadata(slug, data);
+
+  return {
+    slug,
+    content,
+    ...metadata,
+  };
+}
+
+function getPostMetadata(
+  slug: string,
+  data: Record<string, unknown>
+): PostMetadata {
+  assertStringField(slug, data, 'title');
+  assertStringField(slug, data, 'description');
+
+  if (data.tags !== undefined && !isStringArray(data.tags)) {
+    throw new Error(
+      `Invalid frontmatter for post "${slug}": tags must be an array of strings.`
+    );
+  }
+
+  const date = normalizeDateField(slug, data.date, 'date');
+  const updatedAt =
+    data.updatedAt === undefined
+      ? undefined
+      : normalizeDateField(slug, data.updatedAt, 'updatedAt');
+
+  if (data.coverImage !== undefined && typeof data.coverImage !== 'string') {
+    throw new Error(
+      `Invalid frontmatter for post "${slug}": coverImage must be a string.`
+    );
+  }
+
+  return {
+    ...(data as PostMetadata),
+    date,
+    ...(updatedAt !== undefined ? { updatedAt } : {}),
+  };
+}
+
+function assertStringField(
+  slug: string,
+  data: Record<string, unknown>,
+  fieldName: 'title' | 'description' | 'date'
+): asserts data is Record<typeof fieldName, string> {
+  if (typeof data[fieldName] !== 'string') {
+    throw new Error(
+      `Invalid frontmatter for post "${slug}": ${fieldName} must be a string.`
+    );
+  }
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((item) => typeof item === 'string')
+  );
+}
+
+function decodePostSlug(slug: string): string {
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
+function normalizeDateField(
+  slug: string,
+  value: unknown,
+  fieldName: 'date' | 'updatedAt'
+): string {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().split('T')[0];
+  }
+
+  throw new Error(
+    `Invalid frontmatter for post "${slug}": ${fieldName} must be a string.`
+  );
 }
