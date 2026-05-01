@@ -20,6 +20,13 @@ const POSTS_DIRECTORY = 'posts';
 const DEFAULT_BRANCH = 'main';
 const POST_FILE_EXTENSIONS = ['.mdx', '.md'] as const;
 
+export function hasGitHubContentConfig(): boolean {
+  return Boolean(
+    process.env.GITHUB_CONTENT_OWNER?.trim() &&
+    process.env.GITHUB_CONTENT_REPO?.trim()
+  );
+}
+
 export async function getPostSlugs(): Promise<string[]> {
   'use cache';
   cacheLife('days');
