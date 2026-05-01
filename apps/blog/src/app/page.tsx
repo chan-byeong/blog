@@ -1,19 +1,14 @@
-import { SideBar } from '@/components/side-bar';
-import { PostsSection } from '@/components/posts-section';
+import { connection } from 'next/server';
 import { getAllPosts } from '@/lib/posts';
-import { PostStoreProvider } from '@/providers/post-provider';
+import { PostsFilterContainer } from '@/components/posts-section/posts-filter-container';
 
 export default async function Home() {
+  await connection();
   const posts = await getAllPosts();
 
   return (
-    <PostStoreProvider initialState={posts}>
-      <div className='col-span-full grid min-h-[calc(100dvh-41px)] grid-cols-subgrid'>
-        <section className='col-span-full grid grid-cols-subgrid items-start gap-y-8 self-start pt-10 md:gap-y-14 md:pt-20'>
-          <SideBar />
-          <PostsSection />
-        </section>
-      </div>
-    </PostStoreProvider>
+    <div className='col-span-full grid min-h-[calc(100dvh-41px)] grid-cols-subgrid'>
+      <PostsFilterContainer posts={posts} />
+    </div>
   );
 }
