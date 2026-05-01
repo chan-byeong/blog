@@ -1,10 +1,15 @@
 import { TableHeader } from '../ui/table-header';
 import { PostList } from './post-list';
+import type { Post } from '@/types/post';
 
 // TODO: 헤더 영역 CSS @apply 또는 tv, cva 적용하기
-export const PostsSection = () => {
+interface PostsSectionProps {
+  posts: Post[];
+}
+
+export const PostsSection = ({ posts }: PostsSectionProps) => {
   return (
-    <div className='grid grid-cols-subgrid self-start col-span-full md:row-start-2 md:row-span-2 md:col-start-6'>
+    <div className='col-span-full grid grid-cols-subgrid self-start md:col-start-6 md:row-span-2 md:row-start-2'>
       <TableHeader className='col-span-full text-xs'>
         <span className='text-primary col-span-2 col-start-1 font-semibold uppercase sm:col-span-3'>
           / Date
@@ -16,7 +21,7 @@ export const PostsSection = () => {
           / Tags
         </span>
       </TableHeader>
-      <PostList />
+      <PostList posts={posts} />
     </div>
   );
 };

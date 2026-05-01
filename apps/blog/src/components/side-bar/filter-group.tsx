@@ -4,12 +4,14 @@ import { FilterItem } from './filter-item';
 import { TriggerButton } from './trigger-button';
 interface FilterGroupProps {
   filterItems: Record<string, number>;
-  defaultSelectedTags: string[];
+  selectedTags: string[];
+  onTagChange: (tag: string, checked: boolean) => void;
 }
 
 export const FilterGroup = ({
   filterItems = {},
-  defaultSelectedTags = [],
+  selectedTags = [],
+  onTagChange,
 }: FilterGroupProps) => {
   return (
     <aside className='col-span-full grid grid-cols-subgrid gap-y-4 self-start md:col-span-4'>
@@ -32,7 +34,8 @@ export const FilterGroup = ({
                     <FilterItem
                       label={tag}
                       postsCount={count}
-                      defaultChecked={defaultSelectedTags.includes(tag)}
+                      checked={selectedTags.includes(tag)}
+                      onCheckedChange={onTagChange}
                     />
                   </li>
                 ))}

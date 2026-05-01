@@ -7,6 +7,7 @@ export interface GitHubContentConfig {
 
 export interface GitHubContentItem {
   name: string;
+  path: string;
   type: string;
 }
 

@@ -1,7 +1,7 @@
 import { cacheLife, cacheTag } from 'next/cache';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getPostBySlug, getAllPostSlugs } from '../../../lib/posts';
+import { getPostBySlug } from '../../../lib/posts';
 import { parseMDX, extractTOC } from '../../../lib/mdx';
 import { PostHeader } from '../../../components/post/post-header';
 import { PostContent } from '../../../components/post/post-content';

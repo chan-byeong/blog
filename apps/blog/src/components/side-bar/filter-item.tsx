@@ -1,13 +1,15 @@
 'use client';
 
 import { Checkbox } from '@/components/ui/checkbox';
-import { useState } from 'react';
-import { usePostStore } from '@/providers/post-provider';
-import { useShallow } from 'zustand/react/shallow';
 
-interface FilterItemProps extends React.ComponentPropsWithRef<typeof Checkbox> {
+interface FilterItemProps extends Omit<
+  React.ComponentPropsWithRef<typeof Checkbox>,
+  'checked' | 'defaultChecked' | 'onCheckedChange'
+> {
   label: string;
   postsCount: number;
+  checked: boolean;
+  onCheckedChange: (tag: string, checked: boolean) => void;
 }
 // TODO: CSS @apply 또는 tv, cva 적용하기
 
@@ -15,44 +17,30 @@ export const FilterItem = ({
   label,
   postsCount,
   checked,
-  defaultChecked,
   onCheckedChange,
   ...props
 }: FilterItemProps) => {
-  const { addSelectedTag, removeSelectedTag } = usePostStore(
-    useShallow((store) => ({
-      addSelectedTag: store.addSelectedTag,
-      removeSelectedTag: store.removeSelectedTag,
-    }))
-  );
-  const [isChecked, setIsChecked] = useState(
-    defaultChecked || checked || false
-  );
-
   const handleCheckedChange = (value: boolean) => {
-    setIsChecked(value);
-    onCheckedChange?.(value);
-    if (value) {
-      addSelectedTag(label);
-    } else {
-      removeSelectedTag(label);
-    }
+    onCheckedChange(label, value);
   };
-
-  const checkState = checked !== undefined ? checked : isChecked;
 
   return (
     <div
       className='group flex cursor-pointer items-center gap-1.5 px-0.5 py-1 md:gap-2.5'
-      data-state={checkState ? 'checked' : 'unchecked'}
-      onClick={() => handleCheckedChange(!checkState)}
+      data-state={checked ? 'checked' : 'unchecked'}
+      onClick={() => handleCheckedChange(!checked)}
       role='checkbox'
-      aria-checked={checkState === true}
+      aria-checked={checked}
       aria-label={label}
     >
       <Checkbox
-        checked={checkState}
-        onCheckedChange={handleCheckedChange}
+        checked={checked}
+        onClick={(event) => event.stopPropagation()}
+        onCheckedChange={(value) => {
+          if (typeof value === 'boolean') {
+            handleCheckedChange(value);
+          }
+        }}
         {...props}
         className='hidden md:flex'
       />

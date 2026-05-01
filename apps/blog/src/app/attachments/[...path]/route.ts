@@ -8,7 +8,7 @@ import type {
 
 const GITHUB_API_VERSION = '2022-11-28';
 const DEFAULT_BRANCH = 'main';
-const ATTACHMENTS_DIRECTORY = 'attachments';
+const ATTACHMENTS_DIRECTORY = 'posts/attachments';
 const CACHE_CONTROL = 'public, max-age=3600, stale-while-revalidate=86400';
 const CONTENT_TYPES: Record<string, string> = {
   avif: 'image/avif',
