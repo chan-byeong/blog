@@ -1,22 +1,50 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
+import { loginAdminFromConsole } from '@/lib/admin/client-login';
+
+type ConsoleMode = 'normal' | 'password';
+
+type ConsoleCommandResult =
+  | {
+      type: 'output';
+      message: string;
+    }
+  | {
+      type: 'clear';
+    };
+
+const ADMIN_ID_MAX_LENGTH = 64;
+const ADMIN_PASSWORD_MAX_LENGTH = 256;
+const INVALID_CREDENTIALS_MESSAGE = 'Invalid credentials';
 
 export const useConsoleCommand = () => {
-  const [mode, setMode] = useState<'normal' | 'password'>('normal');
+  const [mode, setMode] = useState<ConsoleMode>('normal');
+  const [pendingAdminId, setPendingAdminId] = useState<string | null>(null);
   const { setTheme } = useTheme();
 
   const parseInput = (input: string) => {
-    const [command, options] = input.trim().split(/\s+/).filter(Boolean);
-    return [command?.toLowerCase() ?? '', options];
+    const [command = '', ...options] = input.trim().split(/\s+/);
+
+    return {
+      command: command.toLowerCase(),
+      options,
+    };
   };
 
-  const executeCommand = (input: string) => {
-    const [command, options] = parseInput(input);
+  const executeCommand = async (
+    input: string
+  ): Promise<ConsoleCommandResult> => {
+    if (mode === 'password') {
+      return loginAdmin(input);
+    }
+
+    const { command, options } = parseInput(input);
+
     switch (command) {
       case 'help':
         return {
           type: 'output',
-          message: 'Available commands: help, clear, admin, theme',
+          message: 'Available commands: help, clear, /admin <id>, theme',
         };
       case 'clear':
         return { type: 'clear' };
@@ -33,40 +61,66 @@ export const useConsoleCommand = () => {
           type: 'output',
           message: 'theme command requires "light" or "dark" option',
         };
-      case 'admin':
-        return { type: 'output', message: 'not implemented' };
-        if (options.includes('-l') || options.includes('--login')) {
-          const username = options[1] ?? '';
-          if (!username) {
-            return { type: 'output', message: 'Username is required' };
-          }
-          setMode('password');
-          return {
-            type: 'output',
-            message: `enter your password for ${username}: `,
-          };
-        }
-        return {
-          type: 'output',
-          message: 'admin command requires -l or --login option',
-        };
-      case 'pwd': {
-        const pwd = options[0] ?? '';
-        if (!pwd) {
-          return { type: 'output', message: 'Password is required' };
-        }
-        // TODO: verify password
-        return {
-          type: 'output',
-          message: 'admin login successful, redirecting to /admin...',
-        };
-      }
+      case '/admin':
+        return startAdminLogin(options);
       default:
         return {
           type: 'output',
           message: `Unknown command: ${command}. Type 'help' for available commands.`,
         };
     }
+  };
+
+  const startAdminLogin = (options: string[]): ConsoleCommandResult => {
+    if (options.length !== 1) {
+      return { type: 'output', message: 'usage: /admin <id>' };
+    }
+
+    const adminId = options[0]?.trim() ?? '';
+
+    if (!adminId || adminId.length > ADMIN_ID_MAX_LENGTH) {
+      return { type: 'output', message: 'usage: /admin <id>' };
+    }
+
+    setPendingAdminId(adminId);
+    setMode('password');
+
+    return { type: 'output', message: 'enter admin password:' };
+  };
+
+  const loginAdmin = async (
+    password: string
+  ): Promise<ConsoleCommandResult> => {
+    if (!pendingAdminId) {
+      resetAdminLogin();
+      return { type: 'output', message: INVALID_CREDENTIALS_MESSAGE };
+    }
+
+    if (!password || password.length > ADMIN_PASSWORD_MAX_LENGTH) {
+      return { type: 'output', message: INVALID_CREDENTIALS_MESSAGE };
+    }
+
+    const result = await loginAdminFromConsole({
+      id: pendingAdminId,
+      password,
+    });
+
+    if (result.success) {
+      resetAdminLogin();
+
+      return {
+        type: 'output',
+        message: 'admin login successful, redirecting...',
+      };
+    }
+
+    resetAdminLogin();
+    return { type: 'output', message: INVALID_CREDENTIALS_MESSAGE };
+  };
+
+  const resetAdminLogin = () => {
+    setPendingAdminId(null);
+    setMode('normal');
   };
 
   return {
