@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { readAdminSession } from '@/lib/admin/session';
 
-const ADMIN_HOST = 'admin.byeoung.dev';
+const ADMIN_HOSTS = new Set(['admin.byeoung.dev', 'admin.localhost']);
 const PUBLIC_HOSTS = new Set([
   'byeoung.dev',
   'www.byeoung.dev',
@@ -26,6 +26,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const isAdminRootRequest = isAdminHost(host) && pathname === '/';
+  const needsAdminSession =
+    isAdminRootRequest || isAdminPath(pathname) || isAdminApiPath(pathname);
+
+  if (!needsAdminSession) {
+    return NextResponse.next();
+  }
+
   const session = readAdminSession(
     request.cookies.get(ADMIN_SESSION_COOKIE_NAME)?.value
   );
@@ -36,11 +44,15 @@ export function proxy(request: NextRequest) {
       : createUnauthorizedTextResponse();
   }
 
+  if (isAdminRootRequest) {
+    return NextResponse.rewrite(new URL('/admin', request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/', '/admin/:path*', '/api/admin/:path*'],
 };
 
 function getNormalizedHost(request: NextRequest): string {
@@ -50,7 +62,7 @@ function getNormalizedHost(request: NextRequest): string {
 }
 
 function isAdminHost(host: string): boolean {
-  return host === ADMIN_HOST;
+  return ADMIN_HOSTS.has(host);
 }
 
 function isPublicHost(host: string): boolean {
@@ -71,6 +83,10 @@ function isUnknownHost(host: string): boolean {
 
 function isAdminApiPath(pathname: string): boolean {
   return pathname.startsWith('/api/admin/');
+}
+
+function isAdminPath(pathname: string): boolean {
+  return pathname.startsWith('/admin');
 }
 
 function createNotFoundResponse(): NextResponse {
