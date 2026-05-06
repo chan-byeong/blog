@@ -12,6 +12,7 @@ const ADMIN_SESSION_COOKIE_NAME = 'admin_session';
 const PUBLIC_ADMIN_API_PATHS = new Set([
   '/api/admin/login',
   '/api/admin/logout',
+  '/api/admin/session',
 ]);
 
 export function proxy(request: NextRequest) {
@@ -41,7 +42,7 @@ export function proxy(request: NextRequest) {
   if (session === null) {
     return isAdminApiPath(pathname)
       ? createUnauthorizedJsonResponse()
-      : createUnauthorizedTextResponse();
+      : createNotFoundPageRewrite(request);
   }
 
   if (isAdminRootRequest) {
@@ -93,8 +94,8 @@ function createNotFoundResponse(): NextResponse {
   return new NextResponse('Not Found', { status: 404 });
 }
 
-function createUnauthorizedTextResponse(): NextResponse {
-  return new NextResponse('Unauthorized', { status: 401 });
+function createNotFoundPageRewrite(request: NextRequest): NextResponse {
+  return NextResponse.rewrite(new URL('/_admin-not-found', request.url));
 }
 
 function createUnauthorizedJsonResponse(): NextResponse {

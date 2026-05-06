@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useTheme } from 'next-themes';
-import { loginAdminFromConsole } from '@/lib/admin/client-login';
+import {
+  loginAdminFromConsole,
+  redirectAdminFromConsole,
+} from '@/lib/admin/client-login';
 
 type ConsoleMode = 'normal' | 'password';
 
@@ -16,6 +19,7 @@ type ConsoleCommandResult =
 const ADMIN_ID_MAX_LENGTH = 64;
 const ADMIN_PASSWORD_MAX_LENGTH = 256;
 const INVALID_CREDENTIALS_MESSAGE = 'Invalid credentials';
+const UNAUTHORIZED_MESSAGE = 'Unauthorized';
 
 export const useConsoleCommand = () => {
   const [mode, setMode] = useState<ConsoleMode>('normal');
@@ -44,7 +48,7 @@ export const useConsoleCommand = () => {
       case 'help':
         return {
           type: 'output',
-          message: 'Available commands: help, clear, /admin <id>, theme',
+          message: 'Available commands: help, clear, /admin <id>, /gogo, theme',
         };
       case 'clear':
         return { type: 'clear' };
@@ -63,6 +67,8 @@ export const useConsoleCommand = () => {
         };
       case '/admin':
         return startAdminLogin(options);
+      case '/gogo':
+        return redirectAdmin();
       default:
         return {
           type: 'output',
@@ -86,6 +92,16 @@ export const useConsoleCommand = () => {
     setMode('password');
 
     return { type: 'output', message: 'enter admin password:' };
+  };
+
+  const redirectAdmin = async (): Promise<ConsoleCommandResult> => {
+    const result = await redirectAdminFromConsole();
+
+    if (result.success) {
+      return { type: 'output', message: 'redirecting...' };
+    }
+
+    return { type: 'output', message: UNAUTHORIZED_MESSAGE };
   };
 
   const loginAdmin = async (
