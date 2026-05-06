@@ -1,3 +1,4 @@
+import { readStoredAnalyticsAttribution } from '@/lib/analytics-attribution';
 import { EventType } from '@/types/event-type';
 
 interface AnalyticsEvent {
@@ -7,6 +8,10 @@ interface AnalyticsEvent {
   pathname?: string;
   referrer?: string;
   utm_campaign?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_term?: string;
+  utm_content?: string;
   post_slug?: string;
   post_title?: string;
   [key: string]: unknown;
@@ -29,6 +34,13 @@ function getSessionId(): string {
   const sessionId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
   window.sessionStorage.setItem('analytics_session_id', sessionId);
   return sessionId;
+}
+
+function isAdminPath(): boolean {
+  return (
+    window.location.pathname === '/admin' ||
+    window.location.pathname.startsWith('/admin/')
+  );
 }
 
 class UserAnalytics {
@@ -61,12 +73,17 @@ class UserAnalytics {
       return; // 클라이언트에서만 동작
     }
 
+    if (isAdminPath()) {
+      return;
+    }
+
     // 자동 초기화
     if (!this.isInitialized) {
       this.init();
     }
 
     const analyticsEvent: AnalyticsEvent = {
+      ...readStoredAnalyticsAttribution(),
       event,
       timestamp: new Date().toISOString(),
       session_id: getSessionId(),
