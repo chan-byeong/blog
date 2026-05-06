@@ -4,6 +4,7 @@ node_modules
 .env.*
 !.env.example
 !apps/blog/.env.example
+*.pen
 
 # 로그 및 설정 파일
 apps/blog/nginx/ssl/*.pem
