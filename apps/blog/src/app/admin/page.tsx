@@ -1,17 +1,25 @@
-import { connection } from 'next/server';
-import { AdminPostsManager } from '@/components/admin/admin-posts-manager';
+import { AdminPostList } from '@/components/admin/admin-post-list';
+import { AdminPostsProvider } from '@/components/admin/admin-posts-provider';
+import { AdminPostsSide } from '@/components/admin/admin-posts-side';
+import { Header } from '@/components/side-bar/header';
 import { getAllAdminPosts } from '@/lib/posts';
 import type { AdminPostSummary } from '@/types/admin-post';
 import type { Post } from '@/types/post';
 
 export default async function AdminPage() {
-  await connection();
   const posts = await getAllAdminPosts();
+  const adminPosts = posts.map(toAdminPostSummary);
 
   return (
-    <div className='col-span-full grid min-h-[calc(100dvh-41px)] grid-cols-subgrid'>
-      <AdminPostsManager posts={posts.map(toAdminPostSummary)} />
-    </div>
+    <section className='col-span-full grid grid-cols-subgrid items-start gap-y-8 self-start pt-10 md:gap-y-14 md:pt-20'>
+      <AdminPostsProvider initialPosts={adminPosts}>
+        <aside className='sticky col-span-full row-span-2 row-start-1 grid grid-cols-subgrid grid-rows-subgrid gap-y-8 backdrop-blur-md sm:top-20 sm:gap-y-14 md:col-span-5'>
+          <Header title='Admin' totalPosts={adminPosts.length} />
+          <AdminPostsSide />
+        </aside>
+        <AdminPostList />
+      </AdminPostsProvider>
+    </section>
   );
 }
 
