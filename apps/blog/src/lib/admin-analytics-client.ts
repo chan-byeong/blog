@@ -1,4 +1,3 @@
-const ADMIN_ANALYTICS_QUERY = '{source="client_analytics"}';
 const ADMIN_ANALYTICS_LIMIT = '1000';
 const ADMIN_ANALYTICS_ERROR_MESSAGE = 'Failed to load analytics.';
 
@@ -37,7 +36,6 @@ export function buildAdminAnalyticsRequestUrl(
   analyticsWindow: AdminAnalyticsWindow = DEFAULT_ADMIN_ANALYTICS_WINDOW
 ): string {
   const params = new URLSearchParams({
-    query: ADMIN_ANALYTICS_QUERY,
     since: analyticsWindow,
     limit: ADMIN_ANALYTICS_LIMIT,
     direction: 'backward',

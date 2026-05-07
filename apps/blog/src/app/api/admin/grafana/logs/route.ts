@@ -4,8 +4,8 @@ import {
   createAdminAuthErrorResponse,
   requireAdminRequest,
 } from '@/lib/admin/api';
+import { buildAdminAnalyticsLokiQueryRangeSearchParams } from '@/lib/admin-analytics-loki';
 import {
-  buildLokiQueryRangeSearchParams,
   LokiQueryParamError,
   normalizeLokiQueryRangeUrl,
 } from '@/lib/loki-query';
@@ -42,7 +42,9 @@ export async function GET(
   let queryParams: URLSearchParams;
 
   try {
-    queryParams = buildLokiQueryRangeSearchParams(request.nextUrl.searchParams);
+    queryParams = buildAdminAnalyticsLokiQueryRangeSearchParams(
+      request.nextUrl.searchParams
+    );
   } catch (error) {
     if (error instanceof LokiQueryParamError) {
       return createLokiLogsErrorResponse(error.message, 400);
