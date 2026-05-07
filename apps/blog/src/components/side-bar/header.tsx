@@ -11,12 +11,12 @@ export const Header = ({ title, totalPosts, ...props }: HeaderProps) => {
       {...props}
     >
       {title}
-      <sup
+      <span
         className='text-primary translate-y-7 font-normal tracking-tight'
         style={{ fontSize: 'clamp(0.75rem, 1.5vw, 0.875rem)' }}
       >
-        ( {totalPosts} )
-      </sup>
+        {'(' + totalPosts + ')'}
+      </span>
     </h2>
   );
 };

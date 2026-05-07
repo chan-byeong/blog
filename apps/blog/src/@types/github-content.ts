@@ -13,6 +13,8 @@ export interface GitHubContentItem {
 
 export interface GitHubFileContent {
   type: string;
+  path?: string;
+  sha?: string;
   encoding?: string;
   content?: string;
 }

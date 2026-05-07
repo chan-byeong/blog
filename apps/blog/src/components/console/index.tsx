@@ -21,10 +21,11 @@ export const Console = () => {
     setInput(e.target.value);
   };
 
-  const handlePressEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handlePressEnter = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== 'Enter') return;
-    const result = executeCommand(mode === 'password' ? `pwd ${input}` : input);
+    const commandInput = input;
     setInput('');
+    const result = await executeCommand(commandInput);
 
     if (result.type === 'clear') {
       setLogs([]);

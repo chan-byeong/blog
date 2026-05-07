@@ -14,11 +14,23 @@ import {
   toGitHubContentError,
 } from './github-content-error';
 import { POSTS_CACHE_TAG, getPostCacheTag } from './post-cache-tags';
+import { updatePostPublishedInSource } from './post-visibility';
 
 const GITHUB_API_VERSION = '2022-11-28';
 const POSTS_DIRECTORY = 'posts';
 const DEFAULT_BRANCH = 'main';
 const POST_FILE_EXTENSIONS = ['.md', '.mdx'] as const;
+
+interface GitHubPostFile {
+  path: string;
+  sha: string;
+  source: string;
+}
+
+interface UpdatePostVisibilityResult {
+  source: string;
+  commitSha: string;
+}
 
 export function hasGitHubContentConfig(): boolean {
   return Boolean(
@@ -92,6 +104,54 @@ export async function getAllPostSources(): Promise<PostSource[]> {
     .map(({ slug, source }) => ({ slug, source }));
 }
 
+export async function updateGitHubPostVisibility(
+  slug: string,
+  published: boolean
+): Promise<UpdatePostVisibilityResult | null> {
+  const config = getGitHubContentWriteConfig();
+  const postFile = await getGitHubPostFileBySlug(config, slug);
+
+  if (postFile === null) {
+    return null;
+  }
+
+  const source = updatePostPublishedInSource(postFile.source, published);
+  const octokit = createOctokit(config);
+
+  try {
+    const response = await octokit.repos.createOrUpdateFileContents({
+      owner: config.owner,
+      repo: config.repo,
+      path: postFile.path,
+      branch: config.branch,
+      message: `chore(content): ${
+        published ? 'show' : 'hide'
+      } post ${slug}`,
+      content: Buffer.from(source, 'utf8').toString('base64'),
+      sha: postFile.sha,
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': GITHUB_API_VERSION,
+      },
+    });
+
+    const commitSha = response.data.commit.sha;
+
+    if (commitSha === undefined) {
+      throw new GitHubContentError(
+        'GitHub update response did not include commit sha.'
+      );
+    }
+
+    return {
+      source,
+      commitSha,
+    };
+  } catch (error) {
+    throw toGitHubContentError(error);
+  }
+}
+
 async function getPostItems(): Promise<Array<{ slug: string; path: string }>> {
   const config = getGitHubContentConfig();
   const payload = await fetchGitHubContent(config, POSTS_DIRECTORY);
@@ -134,6 +194,21 @@ function getGitHubContentConfig(): GitHubContentConfig {
     repo,
     branch,
     ...(token ? { token } : {}),
+  };
+}
+
+function getGitHubContentWriteConfig(): Required<GitHubContentConfig> {
+  const config = getGitHubContentConfig();
+
+  if (!config.token) {
+    throw new GitHubContentError(
+      'Missing required environment variable: GITHUB_CONTENT_TOKEN.'
+    );
+  }
+
+  return {
+    ...config,
+    token: config.token,
   };
 }
 
@@ -205,6 +280,37 @@ async function fetchPostContentBySlug(
   return null;
 }
 
+async function getGitHubPostFileBySlug(
+  config: GitHubContentConfig,
+  slug: string
+): Promise<GitHubPostFile | null> {
+  for (const extension of POST_FILE_EXTENSIONS) {
+    const payload = await fetchGitHubContent(
+      config,
+      `${POSTS_DIRECTORY}/${slug}${extension}`,
+      { allowNotFound: true }
+    );
+
+    if (payload === null) {
+      continue;
+    }
+
+    if (!isWritableGitHubFileContent(payload)) {
+      throw new GitHubContentError(
+        `Expected GitHub post "${slug}" response to include file content and sha.`
+      );
+    }
+
+    return {
+      path: payload.path,
+      sha: payload.sha,
+      source: decodeBase64Content(payload.content),
+    };
+  }
+
+  return null;
+}
+
 async function getPostSourceByPath(path: string): Promise<string | null> {
   const config = getGitHubContentConfig();
   const payload = await fetchGitHubContent(config, path, {
@@ -237,9 +343,11 @@ function isGitHubContentItem(value: unknown): value is GitHubContentItem {
   );
 }
 
-function isGitHubFileContent(
-  value: unknown
-): value is Required<GitHubFileContent> {
+function isGitHubFileContent(value: unknown): value is GitHubFileContent & {
+  type: 'file';
+  encoding: 'base64';
+  content: string;
+} {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -249,6 +357,24 @@ function isGitHubFileContent(
     value.type === 'file' &&
     value.encoding === 'base64' &&
     typeof value.content === 'string'
+  );
+}
+
+function isWritableGitHubFileContent(
+  value: unknown
+): value is GitHubFileContent & {
+  type: 'file';
+  encoding: 'base64';
+  content: string;
+  path: string;
+  sha: string;
+} {
+  return (
+    isGitHubFileContent(value) &&
+    'path' in value &&
+    'sha' in value &&
+    typeof value.path === 'string' &&
+    typeof value.sha === 'string'
   );
 }
 

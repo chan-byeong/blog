@@ -28,7 +28,32 @@ export async function getAllPosts(): Promise<Post[]> {
     .filter((post): post is Post => post !== null);
 
   // 날짜순으로 정렬 (최신순)
-  return allPostsData.sort((a, b) => {
+  return sortPostsByDateDesc(allPostsData);
+}
+
+export async function getAllAdminPosts(): Promise<Post[]> {
+  const postSources = await getPostSources();
+  const allPostsData = postSources
+    .map(({ slug, source }) =>
+      parsePostSource(slug, source, { includeUnpublished: true })
+    )
+    .filter((post): post is Post => post !== null);
+
+  return sortPostsByDateDesc(allPostsData);
+}
+
+export function parseAdminPostSource(slug: string, source: string): Post {
+  const post = parsePostSource(slug, source, { includeUnpublished: true });
+
+  if (post === null) {
+    throw new Error(`Invalid admin post source for "${slug}".`);
+  }
+
+  return post;
+}
+
+function sortPostsByDateDesc(posts: Post[]): Post[] {
+  return posts.sort((a, b) => {
     if (a.date < b.date) {
       return 1;
     } else {
@@ -82,10 +107,14 @@ export async function getAllTags(): Promise<string[]> {
   return Array.from(tagsSet).sort();
 }
 
-function parsePostSource(slug: string, source: string): ParsedPost {
+function parsePostSource(
+  slug: string,
+  source: string,
+  options: { includeUnpublished?: boolean } = {}
+): ParsedPost {
   const { data, content } = matter(source);
 
-  if (data.published === false) {
+  if (data.published === false && options.includeUnpublished !== true) {
     return null;
   }
 
