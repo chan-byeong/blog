@@ -1,6 +1,11 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  createApplicationRequestContext,
+  logApplicationResponse,
+  type ApplicationRequestContext,
+} from '@/lib/application-logger';
+import {
   GitHubWebhookSignatureError,
   verifyGitHubWebhookSignature,
 } from '@/lib/github-webhook';
@@ -25,35 +30,70 @@ interface WebhookResponse {
 }
 
 export async function POST(request: NextRequest) {
+  const context = createApplicationRequestContext(request);
   const deliveryId = request.headers.get(GITHUB_DELIVERY_HEADER);
   const contentLength = Number(request.headers.get('content-length') || '0');
 
   if (contentLength > MAX_WEBHOOK_BODY_SIZE) {
-    writeWebhookLog('warn', 'GitHub content webhook body rejected.', {
-      deliveryId,
-      error: 'body_too_large',
-      contentLength,
-      maxBodySize: MAX_WEBHOOK_BODY_SIZE,
-    });
-
-    return NextResponse.json<WebhookResponse>(
-      { success: false, deliveryId, error: 'body_too_large' },
-      { status: 413 }
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, deliveryId, error: 'body_too_large' },
+        { status: 413 }
+      ),
+      context,
+      {
+        level: 'warn',
+        message: 'GitHub content webhook body rejected.',
+        error_code: 'body_too_large',
+        meta: {
+          delivery_id: deliveryId,
+          content_length: contentLength,
+          max_body_size: MAX_WEBHOOK_BODY_SIZE,
+        },
+      }
     );
   }
 
-  const rawBody = await request.text();
+  let rawBody: string;
+
+  try {
+    rawBody = await request.text();
+  } catch (error) {
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, deliveryId, error: 'request_body_read_failed' },
+        { status: 500 }
+      ),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'GitHub content webhook body read failed.',
+        error_code: 'request_body_read_failed',
+        error,
+        meta: {
+          delivery_id: deliveryId,
+        },
+      }
+    );
+  }
 
   if (Buffer.byteLength(rawBody, 'utf8') > MAX_WEBHOOK_BODY_SIZE) {
-    writeWebhookLog('warn', 'GitHub content webhook body rejected.', {
-      deliveryId,
-      error: 'body_too_large',
-      maxBodySize: MAX_WEBHOOK_BODY_SIZE,
-    });
-
-    return NextResponse.json<WebhookResponse>(
-      { success: false, deliveryId, error: 'body_too_large' },
-      { status: 413 }
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, deliveryId, error: 'body_too_large' },
+        { status: 413 }
+      ),
+      context,
+      {
+        level: 'warn',
+        message: 'GitHub content webhook body rejected.',
+        error_code: 'body_too_large',
+        meta: {
+          delivery_id: deliveryId,
+          max_body_size: MAX_WEBHOOK_BODY_SIZE,
+        },
+      }
     );
   }
 
@@ -63,35 +103,61 @@ export async function POST(request: NextRequest) {
     verifyGitHubWebhookSignature({ rawBody, signature });
   } catch (error) {
     if (error instanceof GitHubWebhookSignatureError) {
-      writeWebhookLog('warn', 'GitHub content webhook signature rejected.', {
-        deliveryId,
-        error: error.code,
-        status: error.status,
-      });
-
-      return NextResponse.json<WebhookResponse>(
-        { success: false, deliveryId, error: error.code },
-        { status: error.status }
+      return logWebhookResponse(
+        NextResponse.json<WebhookResponse>(
+          { success: false, deliveryId, error: error.code },
+          { status: error.status }
+        ),
+        context,
+        {
+          level: error.status >= 500 ? 'error' : 'warn',
+          kind: error.status >= 500 ? 'app_error' : 'app_event',
+          message: 'GitHub content webhook signature rejected.',
+          error_code: error.code,
+          meta: {
+            delivery_id: deliveryId,
+          },
+        }
       );
     }
 
-    return NextResponse.json<WebhookResponse>(
-      { success: false, deliveryId, error: 'signature_verification_failed' },
-      { status: 500 }
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, deliveryId, error: 'signature_verification_failed' },
+        { status: 500 }
+      ),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'GitHub content webhook signature verification failed.',
+        error_code: 'signature_verification_failed',
+        error,
+        meta: {
+          delivery_id: deliveryId,
+        },
+      }
     );
   }
 
   const event = request.headers.get(GITHUB_EVENT_HEADER);
 
   if (event !== 'push') {
-    writeWebhookLog('info', 'GitHub content webhook event ignored.', {
-      deliveryId,
-      event,
-    });
-
-    return NextResponse.json<WebhookResponse>(
-      { success: false, event, deliveryId, error: 'unsupported_event' },
-      { status: 202 }
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, event, deliveryId, error: 'unsupported_event' },
+        { status: 202 }
+      ),
+      context,
+      {
+        level: 'info',
+        message: 'GitHub content webhook event ignored.',
+        error_code: 'unsupported_event',
+        meta: {
+          delivery_id: deliveryId,
+          event,
+        },
+      }
     );
   }
 
@@ -100,61 +166,103 @@ export async function POST(request: NextRequest) {
   try {
     payload = JSON.parse(rawBody);
   } catch {
-    writeWebhookLog('warn', 'GitHub content webhook JSON parsing failed.', {
-      deliveryId,
-      event,
-    });
-
-    return NextResponse.json<WebhookResponse>(
-      { success: false, event, deliveryId, error: 'invalid_json' },
-      { status: 400 }
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        { success: false, event, deliveryId, error: 'invalid_json' },
+        { status: 400 }
+      ),
+      context,
+      {
+        level: 'warn',
+        message: 'GitHub content webhook JSON parsing failed.',
+        error_code: 'invalid_json',
+        meta: {
+          delivery_id: deliveryId,
+          event,
+        },
+      }
     );
   }
 
-  const slugs = getChangedPostSlugs(payload);
-  const tags = [POSTS_CACHE_TAG, ...slugs.map(getPostCacheTag)];
-  const paths = ['/', ...slugs.map((slug) => `/posts/${slug}`)];
+  try {
+    const slugs = getChangedPostSlugs(payload);
+    const tags = [POSTS_CACHE_TAG, ...slugs.map(getPostCacheTag)];
+    const paths = ['/', ...slugs.map((slug) => `/posts/${slug}`)];
 
-  for (const tag of tags) {
-    revalidateTag(tag, { expire: 0 });
+    for (const tag of tags) {
+      revalidateTag(tag, { expire: 0 });
+    }
+
+    for (const path of paths) {
+      revalidatePath(path);
+    }
+
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>({
+        success: true,
+        event,
+        deliveryId,
+        revalidated: {
+          tags,
+          paths,
+          slugs,
+        },
+      }),
+      context,
+      {
+        level: 'info',
+        message: 'GitHub content webhook revalidated cache.',
+        meta: {
+          delivery_id: deliveryId,
+          event,
+          tags,
+          paths,
+          slugs,
+        },
+      }
+    );
+  } catch (error) {
+    return logWebhookResponse(
+      NextResponse.json<WebhookResponse>(
+        {
+          success: false,
+          event,
+          deliveryId,
+          error: 'cache_revalidation_failed',
+        },
+        { status: 500 }
+      ),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'GitHub content webhook cache revalidation failed.',
+        error_code: 'cache_revalidation_failed',
+        error,
+        meta: {
+          delivery_id: deliveryId,
+          event,
+        },
+      }
+    );
   }
-
-  for (const path of paths) {
-    revalidatePath(path);
-  }
-
-  writeWebhookLog('info', 'GitHub content webhook revalidated cache.', {
-    deliveryId,
-    event,
-    tags,
-    paths,
-    slugs,
-  });
-
-  return NextResponse.json<WebhookResponse>({
-    success: true,
-    event,
-    deliveryId,
-    revalidated: {
-      tags,
-      paths,
-      slugs,
-    },
-  });
 }
 
-function writeWebhookLog(
-  level: 'info' | 'warn',
-  message: string,
-  metadata: Record<string, unknown>
-): void {
-  process.stdout.write(
-    `${JSON.stringify({
-      level,
-      message,
-      source: 'github_content_webhook',
-      ...metadata,
-      timestamp: new Date().toISOString(),
-    })}\n`
-  );
+function logWebhookResponse<T extends NextResponse>(
+  response: T,
+  context: ApplicationRequestContext,
+  input: {
+    level: 'info' | 'warn' | 'error';
+    kind?: 'app_event' | 'app_error';
+    message: string;
+    error_code?: string;
+    error?: unknown;
+    meta?: Record<string, unknown>;
+  }
+): T {
+  return logApplicationResponse(response, context, {
+    ...input,
+    kind: input.kind ?? 'app_event',
+    context: 'github_content_webhook',
+  });
 }

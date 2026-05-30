@@ -1,5 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import {
+  createApplicationRequestContext,
+  logApplicationResponse,
+  withApplicationRequestId,
+} from '@/lib/application-logger';
+import {
   createAdminAuthErrorResponse,
   createAdminErrorResponse,
   requireAdminRequest,
@@ -28,29 +33,63 @@ interface AdminPostsResponse {
 
 export async function GET(
   request: NextRequest
-): Promise<NextResponse<AdminPostsResponse | { success: false; error: string }>> {
+): Promise<
+  NextResponse<AdminPostsResponse | { success: false; error: string }>
+> {
+  const context = createApplicationRequestContext(request);
+
   try {
     requireAdminRequest(request);
   } catch (error) {
-    return createAdminAuthErrorResponse(error);
+    return withApplicationRequestId(
+      createAdminAuthErrorResponse(error),
+      context
+    );
   }
 
   try {
     const posts = await getAllAdminPosts();
 
-    return NextResponse.json<AdminPostsResponse>({
-      success: true,
-      posts: posts.map(toAdminPostSummary),
-    });
+    return withApplicationRequestId(
+      NextResponse.json<AdminPostsResponse>({
+        success: true,
+        posts: posts.map(toAdminPostSummary),
+      }),
+      context
+    );
   } catch (error) {
     if (error instanceof GitHubContentError) {
-      return createAdminErrorResponse(
-        'Failed to fetch GitHub content',
-        error.status === undefined ? 500 : 502
+      return logApplicationResponse(
+        createAdminErrorResponse(
+          'Failed to fetch GitHub content',
+          error.status === undefined ? 500 : 502
+        ),
+        context,
+        {
+          level: 'error',
+          kind: 'app_error',
+          message: 'Admin posts GitHub content request failed.',
+          context: 'admin_posts',
+          error_code: 'github_content_request_failed',
+          ...(error.status === undefined
+            ? {}
+            : { meta: { upstream_status: error.status } }),
+        }
       );
     }
 
-    return createAdminErrorResponse('Failed to fetch posts', 500);
+    return logApplicationResponse(
+      createAdminErrorResponse('Failed to fetch posts', 500),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'Admin posts request failed unexpectedly.',
+        context: 'admin_posts',
+        error_code: 'unexpected_admin_posts_error',
+        error,
+      }
+    );
   }
 }
 
