@@ -1,4 +1,4 @@
-import { buildLokiQueryRangeSearchParams } from './loki-query.ts';
+import { buildLokiQueryRangeSearchParams } from './loki-query';
 
 const ADMIN_ANALYTICS_QUERY = '{source="client_analytics"}';
 
