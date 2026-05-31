@@ -5,6 +5,11 @@ import type {
   GitHubFileContent,
   GitHubRequestError,
 } from '@/@types/github-content';
+import {
+  createApplicationRequestContext,
+  logApplicationResponse,
+  withApplicationRequestId,
+} from '@/lib/application-logger';
 
 const GITHUB_API_VERSION = '2022-11-28';
 const DEFAULT_BRANCH = 'main';
@@ -27,44 +32,110 @@ interface AttachmentRouteParams {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: AttachmentRouteParams
 ) {
+  const context = createApplicationRequestContext(request);
   const { path } = await params;
   const attachmentPath = getAttachmentPath(path);
 
   if (attachmentPath === null) {
-    return Response.json(
-      { success: false, error: 'invalid_attachment_path' },
-      { status: 400 }
+    return withApplicationRequestId(
+      Response.json(
+        { success: false, error: 'invalid_attachment_path' },
+        { status: 400 }
+      ),
+      context
     );
   }
 
-  const config = getGitHubContentConfig();
-  const payload = await fetchAttachmentContent(config, attachmentPath);
+  let payload: unknown | null;
+
+  try {
+    const config = getGitHubContentConfig();
+
+    payload = await fetchAttachmentContent(config, attachmentPath);
+  } catch (error) {
+    const isConfigurationError = error instanceof AttachmentConfigError;
+    const upstreamStatus = isGitHubRequestError(error)
+      ? error.status
+      : undefined;
+
+    return logApplicationResponse(
+      Response.json(
+        {
+          success: false,
+          error: isConfigurationError
+            ? 'attachment_proxy_unavailable'
+            : 'attachment_upstream_failed',
+        },
+        { status: isConfigurationError ? 500 : 502 }
+      ),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: isConfigurationError
+          ? 'Attachment proxy configuration is unavailable.'
+          : 'Attachment proxy GitHub content request failed.',
+        context: 'attachment_proxy',
+        error_code: isConfigurationError
+          ? 'missing_github_content_configuration'
+          : 'github_content_request_failed',
+        ...(!isConfigurationError && upstreamStatus === undefined
+          ? { error }
+          : {}),
+        meta: {
+          attachment_path: attachmentPath,
+          ...(upstreamStatus === undefined
+            ? {}
+            : { upstream_status: upstreamStatus }),
+        },
+      }
+    );
+  }
 
   if (payload === null) {
-    return Response.json(
-      { success: false, error: 'attachment_not_found' },
-      { status: 404 }
+    return withApplicationRequestId(
+      Response.json(
+        { success: false, error: 'attachment_not_found' },
+        { status: 404 }
+      ),
+      context
     );
   }
 
   if (!isGitHubFileContent(payload)) {
-    return Response.json(
-      { success: false, error: 'invalid_attachment_content' },
-      { status: 502 }
+    return logApplicationResponse(
+      Response.json(
+        { success: false, error: 'invalid_attachment_content' },
+        { status: 502 }
+      ),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'Attachment proxy GitHub content response was invalid.',
+        context: 'attachment_proxy',
+        error_code: 'invalid_attachment_content',
+        meta: {
+          attachment_path: attachmentPath,
+        },
+      }
     );
   }
 
   const body = Buffer.from(payload.content.replace(/\s/g, ''), 'base64');
 
-  return new Response(body, {
-    headers: {
-      'Cache-Control': CACHE_CONTROL,
-      'Content-Type': getContentType(attachmentPath),
-    },
-  });
+  return withApplicationRequestId(
+    new Response(body, {
+      headers: {
+        'Cache-Control': CACHE_CONTROL,
+        'Content-Type': getContentType(attachmentPath),
+      },
+    }),
+    context
+  );
 }
 
 function getAttachmentPath(pathSegments: string[]): string | null {
@@ -86,13 +157,13 @@ function getGitHubContentConfig(): GitHubContentConfig {
   const token = process.env.GITHUB_CONTENT_TOKEN?.trim();
 
   if (!owner) {
-    throw new Error(
+    throw new AttachmentConfigError(
       'Missing required environment variable: GITHUB_CONTENT_OWNER.'
     );
   }
 
   if (!repo) {
-    throw new Error(
+    throw new AttachmentConfigError(
       'Missing required environment variable: GITHUB_CONTENT_REPO.'
     );
   }
@@ -103,6 +174,13 @@ function getGitHubContentConfig(): GitHubContentConfig {
     branch,
     ...(token ? { token } : {}),
   };
+}
+
+class AttachmentConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AttachmentConfigError';
+  }
 }
 
 async function fetchAttachmentContent(

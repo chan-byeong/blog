@@ -1,11 +1,16 @@
 import { Buffer } from 'node:buffer';
 import { NextResponse, type NextRequest } from 'next/server';
 import {
+  createApplicationRequestContext,
+  logApplicationResponse,
+  withApplicationRequestId,
+} from '@/lib/application-logger';
+import {
   createAdminAuthErrorResponse,
   requireAdminRequest,
 } from '@/lib/admin/api';
+import { buildGrafanaLogsQueryRangeSearchParams } from '@/lib/admin-analytics-loki';
 import {
-  buildLokiQueryRangeSearchParams,
   LokiQueryParamError,
   normalizeLokiQueryRangeUrl,
 } from '@/lib/loki-query';
@@ -33,28 +38,51 @@ interface LokiConfig {
 export async function GET(
   request: NextRequest
 ): Promise<NextResponse<LokiLogsSuccessResponse | LokiLogsErrorResponse>> {
+  const context = createApplicationRequestContext(request);
+
   try {
     requireAdminRequest(request);
   } catch (error) {
-    return createAdminAuthErrorResponse(error);
+    return withApplicationRequestId(
+      createAdminAuthErrorResponse(error),
+      context
+    );
   }
 
   let queryParams: URLSearchParams;
 
   try {
-    queryParams = buildLokiQueryRangeSearchParams(request.nextUrl.searchParams);
+    queryParams = buildGrafanaLogsQueryRangeSearchParams(
+      request.nextUrl.searchParams
+    );
   } catch (error) {
     if (error instanceof LokiQueryParamError) {
-      return createLokiLogsErrorResponse(error.message, 400);
+      return withApplicationRequestId(
+        createLokiLogsErrorResponse(error.message, 400),
+        context
+      );
     }
 
-    return createLokiLogsErrorResponse('Invalid query parameters', 400);
+    return withApplicationRequestId(
+      createLokiLogsErrorResponse('Invalid query parameters', 400),
+      context
+    );
   }
 
   const config = getLokiConfig();
 
   if (config === null) {
-    return createLokiLogsErrorResponse('Grafana Cloud is not configured', 500);
+    return logApplicationResponse(
+      createLokiLogsErrorResponse('Grafana Cloud is not configured', 500),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'Grafana Cloud configuration is unavailable.',
+        context: 'admin_grafana_logs',
+        error_code: 'missing_loki_configuration',
+      }
+    );
   }
 
   const lokiUrl = new URL(config.queryRangeUrl);
@@ -70,21 +98,58 @@ export async function GET(
     });
 
     if (!response.ok) {
-      return createLokiLogsErrorResponse('Failed to fetch Loki logs', 502);
+      return logApplicationResponse(
+        createLokiLogsErrorResponse('Failed to fetch Loki logs', 502),
+        context,
+        {
+          level: 'error',
+          kind: 'app_error',
+          message: 'Grafana Cloud Loki request failed.',
+          context: 'admin_grafana_logs',
+          error_code: 'loki_request_failed',
+          meta: {
+            upstream_status: response.status,
+          },
+        }
+      );
     }
 
     const payload = (await response.json()) as LokiQueryRangeResponse;
 
     if (!isLokiQueryRangeResponse(payload)) {
-      return createLokiLogsErrorResponse('Invalid Loki response', 502);
+      return logApplicationResponse(
+        createLokiLogsErrorResponse('Invalid Loki response', 502),
+        context,
+        {
+          level: 'error',
+          kind: 'app_error',
+          message: 'Grafana Cloud Loki response was invalid.',
+          context: 'admin_grafana_logs',
+          error_code: 'invalid_loki_response',
+        }
+      );
     }
 
-    return NextResponse.json<LokiLogsSuccessResponse>({
-      success: true,
-      data: payload.data,
-    });
-  } catch {
-    return createLokiLogsErrorResponse('Failed to fetch Loki logs', 502);
+    return withApplicationRequestId(
+      NextResponse.json<LokiLogsSuccessResponse>({
+        success: true,
+        data: payload.data,
+      }),
+      context
+    );
+  } catch (error) {
+    return logApplicationResponse(
+      createLokiLogsErrorResponse('Failed to fetch Loki logs', 502),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'Grafana Cloud Loki request failed unexpectedly.',
+        context: 'admin_grafana_logs',
+        error_code: 'unexpected_loki_request_error',
+        error,
+      }
+    );
   }
 }
 

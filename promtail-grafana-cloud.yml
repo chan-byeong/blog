@@ -34,13 +34,13 @@ scrape_configs:
       - source_labels: ['__meta_docker_container_name']
         regex: '/(.*)'
         target_label: container
-      # 로그 스트림 (stdout/stderr)
+      # stdout / stderr 구분
       - source_labels: ['__meta_docker_container_log_stream']
         target_label: stream
 
     pipeline_stages:
-      # 1단계: Docker CRI 형식 파싱 (Docker json-file driver)
-      - cri: {}
+      # 1단계: Docker json-file 형식 파싱
+      - docker: {}
 
       # 2단계: 애플리케이션 JSON 로그 파싱
       - json:
@@ -48,15 +48,17 @@ scrape_configs:
             timestamp: timestamp
             level: level
             source: source
+            kind: kind
             message: message
             method: method
             path: path
             url: url
             status: status
             ip: ip
-            request_time: request_time
+            request_time_s: request_time_s
+            upstream_status: upstream_status
+            upstream_response_time_s: upstream_response_time_s
             duration_ms: duration_ms
-            trace_id: trace_id
             user_agent: user_agent
             referer: referer
             host: host
@@ -68,8 +70,6 @@ scrape_configs:
           level:
           source:
           method:
-          container:
-          stream:
 
       # 4단계: 타임스탬프 파싱
       - timestamp:
@@ -79,15 +79,3 @@ scrape_configs:
             - RFC3339
             - '2006-01-02T15:04:05.000Z07:00'
             - '2006-01-02T15:04:05Z07:00'
-
-      # 5단계: 출력 포맷 (message 필드 사용)
-      - output:
-          source: message
-
-  - job_name: docker_filtered
-    docker_sd_configs:
-      - host: unix:///var/run/docker.sock
-        refresh_interval: 5s
-    pipeline_stages:
-      - drop:
-          expression: '.*favicon.ico.*'

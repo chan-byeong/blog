@@ -8,8 +8,17 @@ import {
 test('builds the admin Loki analytics request URL', () => {
   assert.equal(
     buildAdminAnalyticsRequestUrl(),
-    '/api/admin/grafana/logs?query=%7Bsource%3D%22client_analytics%22%7D&since=1d&limit=1000&direction=backward'
+    '/api/admin/grafana/logs?since=1d&limit=1000&direction=backward'
   );
+});
+
+test('does not include Loki query in the client request URL', () => {
+  const url = new URL(
+    buildAdminAnalyticsRequestUrl(),
+    'https://byeoung.dev'
+  );
+
+  assert.equal(url.searchParams.has('query'), false);
 });
 
 test('builds analytics request URLs for selected log windows', () => {

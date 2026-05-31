@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  createApplicationRequestContext,
+  logApplicationResponse,
+  type ApplicationRequestContext,
+} from '@/lib/application-logger';
+import {
   AdminAuthError,
   createAdminSessionCookie,
   verifyAdminCredentials,
@@ -26,8 +31,10 @@ interface LoginPayload {
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<LoginSuccessResponse | LoginErrorResponse>> {
+  const context = createApplicationRequestContext(request);
+
   if (isBodyTooLarge(request.headers.get('content-length'))) {
-    return createBodyTooLargeResponse();
+    return createBodyTooLargeResponse(context);
   }
 
   let rawBody: string;
@@ -35,17 +42,17 @@ export async function POST(
   try {
     rawBody = await request.text();
   } catch {
-    return createInvalidCredentialsResponse();
+    return createInvalidCredentialsResponse(context, 'invalid_request_body');
   }
 
   if (Buffer.byteLength(rawBody, 'utf8') > MAX_BODY_SIZE) {
-    return createBodyTooLargeResponse();
+    return createBodyTooLargeResponse(context);
   }
 
   const payload = parseLoginPayload(rawBody);
 
   if (payload === null) {
-    return createInvalidCredentialsResponse();
+    return createInvalidCredentialsResponse(context, 'invalid_credentials');
   }
 
   try {
@@ -55,7 +62,7 @@ export async function POST(
     );
 
     if (!isValidCredentials) {
-      return createInvalidCredentialsResponse();
+      return createInvalidCredentialsResponse(context, 'invalid_credentials');
     }
 
     const sessionCookie = createAdminSessionCookie();
@@ -71,16 +78,42 @@ export async function POST(
       sessionCookie.options
     );
 
-    return response;
+    return logApplicationResponse(response, context, {
+      level: 'info',
+      kind: 'app_event',
+      message: 'Admin login succeeded.',
+      context: 'admin_login',
+    });
   } catch (error) {
     if (error instanceof AdminAuthError && error.code === 'missing_admin_env') {
-      return NextResponse.json<LoginErrorResponse>(
-        { success: false, error: 'Authentication unavailable' },
-        { status: 500 }
+      return logApplicationResponse(
+        NextResponse.json<LoginErrorResponse>(
+          { success: false, error: 'Authentication unavailable' },
+          { status: 500 }
+        ),
+        context,
+        {
+          level: 'error',
+          kind: 'app_error',
+          message: 'Admin login configuration is unavailable.',
+          context: 'admin_login',
+          error_code: error.code,
+        }
       );
     }
 
-    return createInvalidCredentialsResponse();
+    return logApplicationResponse(
+      createInvalidCredentialsJsonResponse(),
+      context,
+      {
+        level: 'error',
+        kind: 'app_error',
+        message: 'Admin login failed unexpectedly.',
+        context: 'admin_login',
+        error_code: 'unexpected_admin_login_error',
+        error,
+      }
+    );
   }
 }
 
@@ -134,16 +167,48 @@ function isLoginPayload(value: unknown): value is LoginPayload {
   );
 }
 
-function createInvalidCredentialsResponse(): NextResponse<LoginErrorResponse> {
+function createInvalidCredentialsJsonResponse(): NextResponse<LoginErrorResponse> {
   return NextResponse.json<LoginErrorResponse>(
     { success: false, error: 'Invalid credentials' },
     { status: 401 }
   );
 }
 
-function createBodyTooLargeResponse(): NextResponse<LoginErrorResponse> {
-  return NextResponse.json<LoginErrorResponse>(
-    { success: false, error: 'Request body too large' },
-    { status: 413 }
+function createInvalidCredentialsResponse(
+  context: ApplicationRequestContext,
+  errorCode: 'invalid_request_body' | 'invalid_credentials'
+): NextResponse<LoginErrorResponse> {
+  return logApplicationResponse(
+    createInvalidCredentialsJsonResponse(),
+    context,
+    {
+      level: 'warn',
+      kind: 'app_event',
+      message: 'Admin login credentials rejected.',
+      context: 'admin_login',
+      error_code: errorCode,
+    }
+  );
+}
+
+function createBodyTooLargeResponse(
+  context: ApplicationRequestContext
+): NextResponse<LoginErrorResponse> {
+  return logApplicationResponse(
+    NextResponse.json<LoginErrorResponse>(
+      { success: false, error: 'Request body too large' },
+      { status: 413 }
+    ),
+    context,
+    {
+      level: 'warn',
+      kind: 'app_event',
+      message: 'Admin login body rejected.',
+      context: 'admin_login',
+      error_code: 'body_too_large',
+      meta: {
+        max_body_size: MAX_BODY_SIZE,
+      },
+    }
   );
 }
