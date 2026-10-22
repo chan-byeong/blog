@@ -10,8 +10,8 @@ export function AdminStatusBadge({ published }: AdminStatusBadgeProps) {
       className={cn(
         'inline-flex border px-2 py-1 text-xs font-semibold uppercase',
         published
-          ? 'border-primary/30 text-primary'
-          : 'border-destructive/40 text-destructive'
+          ? 'border-border-subtle text-foreground'
+          : 'border-destructive-border text-destructive'
       )}
     >
       {published ? 'VISIBLE' : 'HIDDEN'}

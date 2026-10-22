@@ -1,7 +1,6 @@
 import { cn } from '@/lib/utils';
 
-interface AdminControlButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface AdminControlButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   selected?: boolean;
 }
 
@@ -15,7 +14,7 @@ export function AdminControlButton({
     <button
       type='button'
       className={cn(
-        'border-border/40 text-primary hover:bg-accent/50 disabled:text-primary/40 border px-2 py-1.5 text-left text-xs font-semibold tracking-tight transition-colors disabled:cursor-not-allowed disabled:hover:bg-transparent',
+        'border-border-subtle text-foreground hover:bg-wash disabled:text-foreground-disabled border px-2 py-1.5 text-left text-xs font-semibold tracking-tight transition-colors disabled:cursor-not-allowed disabled:hover:bg-transparent',
         selected ? 'bg-foreground text-background hover:bg-foreground' : '',
         className
       )}

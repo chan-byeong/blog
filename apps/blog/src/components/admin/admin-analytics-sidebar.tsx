@@ -22,7 +22,7 @@ export function AdminAnalyticsSidebar() {
   return (
     <div className='col-span-full grid grid-cols-subgrid gap-y-4 self-start md:col-span-4'>
       <TableHeader className='col-span-full'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / overview
         </span>
       </TableHeader>
@@ -34,7 +34,7 @@ export function AdminAnalyticsSidebar() {
       </div>
 
       <TableHeader className='col-span-full mt-3'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / sources
         </span>
       </TableHeader>
@@ -55,14 +55,14 @@ export function AdminAnalyticsSidebar() {
             </AdminControlButton>
           ))
         ) : (
-          <p className='text-primary/60 col-span-full text-xs font-semibold uppercase'>
+          <p className='text-muted-foreground col-span-full text-xs font-semibold uppercase'>
             No attribution groups.
           </p>
         )}
       </div>
 
       <TableHeader className='col-span-full mt-3'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / range
         </span>
       </TableHeader>

@@ -3,7 +3,7 @@ import { FooterYear } from './footer-year';
 
 export const Footer = () => {
   return (
-    <footer className='border-border/50 text-primary/70 col-span-full mt-10 grid grid-cols-subgrid border-t-[0.5px] py-3'>
+    <footer className='border-border-subtle text-foreground-secondary col-span-full mt-10 grid grid-cols-subgrid border-t-[0.5px] py-3'>
       <div className='col-span-3 col-start-1 text-xs sm:col-span-4 sm:col-start-1 md:col-span-5 md:col-start-1'>
         <span>
           © <FooterYear /> BYEOUNG.DEV

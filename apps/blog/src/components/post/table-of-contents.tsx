@@ -56,7 +56,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
   return (
     <nav className='col-span-full mt-2 block self-start'>
       <div className='space-y-2'>
-        <ul className='border-border/50 mb-2 ml-2 space-y-2 border-l border-dotted'>
+        <ul className='border-border-subtle mb-2 ml-2 space-y-2 border-l border-dotted'>
           {items.map((item) => {
             const isActive = activeId === item.id;
             const paddingLeft = (item.level - 1) * 12 + 16;
@@ -67,7 +67,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
                   onClick={() => handleClick(item.id)}
                   className={`hover:text-foreground block w-full cursor-pointer text-left text-sm transition-colors ${
                     isActive
-                      ? 'text-primary font-medium'
+                      ? 'text-foreground font-medium'
                       : 'text-muted-foreground'
                   }`}
                 >

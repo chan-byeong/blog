@@ -8,10 +8,10 @@ interface PostListItemProps {
 
 export const PostListItem = ({ post }: PostListItemProps) => {
   return (
-    <li className='border-border/50 text-primary group dark:hover:text-secondary isolate col-span-full grid grid-cols-subgrid items-center border-b-[0.5px]'>
+    <li className='border-border-subtle text-foreground group hover:text-paper-ink isolate col-span-full grid grid-cols-subgrid items-center border-b-[0.5px]'>
       <Link
         href={`/posts/${post.slug}`}
-        className='hover:bg-accent/50 hover:paper-texture-overlay col-span-full grid grid-cols-subgrid items-center self-start px-1 py-2.5'
+        className='hover:bg-wash hover:paper-texture-overlay col-span-full grid grid-cols-subgrid items-center self-start px-1 py-2.5'
       >
         <span className='col-span-2 col-start-1 text-[13px] font-semibold sm:col-span-3'>
           {post.date}
@@ -19,7 +19,7 @@ export const PostListItem = ({ post }: PostListItemProps) => {
         <div className='col-span-4 col-start-3 flex flex-col gap-0.5 sm:col-span-10 sm:col-start-4 md:col-span-13'>
           <span className='text-md font-bold'>{post.title}</span>
           {post.description ? (
-            <p className='dark:group-hover:text-secondary/80 text-primary/80 line-clamp-1 text-[14px]'>
+            <p className='text-foreground-secondary group-hover:text-paper-ink line-clamp-1 text-[14px]'>
               {post.description}
             </p>
           ) : null}
@@ -29,7 +29,7 @@ export const PostListItem = ({ post }: PostListItemProps) => {
             <Tag
               key={tag}
               label={`# ${tag}`}
-              className='dark:group-hover:text-secondary'
+              className='group-hover:text-paper-ink'
             />
           ))}
         </span>

@@ -11,19 +11,17 @@ interface CalloutProps {
  */
 export function Callout({ children, type = 'info', title }: CalloutProps) {
   const styles = {
-    info: 'bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900',
-    warning:
-      'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-900',
-    error: 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900',
-    success:
-      'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-900',
+    info: 'bg-callout-info-bg border-callout-info-border',
+    warning: 'bg-callout-warning-bg border-callout-warning-border',
+    error: 'bg-callout-error-bg border-callout-error-border',
+    success: 'bg-callout-success-bg border-callout-success-border',
   };
 
   const iconStyles = {
-    info: 'text-blue-600 dark:text-blue-400',
-    warning: 'text-yellow-600 dark:text-yellow-400',
-    error: 'text-red-600 dark:text-red-400',
-    success: 'text-green-600 dark:text-green-400',
+    info: 'text-callout-info-icon',
+    warning: 'text-callout-warning-icon',
+    error: 'text-callout-error-icon',
+    success: 'text-callout-success-icon',
   };
 
   const icons = {
@@ -41,7 +39,7 @@ export function Callout({ children, type = 'info', title }: CalloutProps) {
           {title && (
             <h4 className='text-foreground mb-2 font-semibold'>{title}</h4>
           )}
-          <div className='text-foreground/90 text-sm'>{children}</div>
+          <div className='text-foreground text-sm'>{children}</div>
         </div>
       </div>
     </div>

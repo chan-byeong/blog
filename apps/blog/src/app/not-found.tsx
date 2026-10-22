@@ -11,7 +11,7 @@ export default function NotFound() {
       </p>
       <Link
         href='/'
-        className='bg-foreground text-background hover:bg-foreground/30 hover:text-primary/80 inline-block px-5 py-3 transition-colors'
+        className='bg-foreground text-background hover:bg-wash hover:text-foreground-secondary inline-block px-5 py-3 transition-colors'
       >
         메인 페이지로 돌아가기
       </Link>

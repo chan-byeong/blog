@@ -22,7 +22,7 @@ export const ConsoleHeader = ({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
     >
-      <span className='text-xs text-gray-800'>CONSOLE</span>
+      <span className='text-console-label text-xs'>CONSOLE</span>
       <span
         data-console-close
         onClick={close}
@@ -30,7 +30,7 @@ export const ConsoleHeader = ({
         role='button'
         tabIndex={0}
       >
-        <i className='hn hn-window-close inline-block text-sm text-gray-800'></i>
+        <i className='hn hn-window-close text-console-label inline-block text-sm'></i>
       </span>
     </div>
   );

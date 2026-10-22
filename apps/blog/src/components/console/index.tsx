@@ -40,7 +40,7 @@ export const Console = () => {
     <div
       ref={containerRef}
       aria-label='console'
-      className='fixed right-4 bottom-0 flex h-96 w-full max-w-2xl flex-col overflow-hidden border border-black bg-[#e9e9e9] font-mono text-sm shadow-md'
+      className='border-console-border bg-console-frame fixed right-4 bottom-0 flex h-96 w-full max-w-2xl flex-col overflow-hidden border font-mono text-sm shadow-md'
     >
       <ConsoleHeader {...handleProps} />
       <ConsoleBody

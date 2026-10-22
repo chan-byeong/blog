@@ -11,9 +11,9 @@ interface CodeBlockProps {
  */
 export function CodeBlock({ children, language, filename }: CodeBlockProps) {
   return (
-    <div className='bg-muted/30 my-6 overflow-hidden rounded-xs'>
+    <div className='bg-code-bg my-6 overflow-hidden rounded-xs'>
       {(filename || language) && (
-        <div className='text-muted-foreground border-border/40 bg-muted/20 flex items-center justify-between border-b px-4 py-2 text-xs'>
+        <div className='text-muted-foreground border-border-subtle bg-code-header-bg flex items-center justify-between border-b px-4 py-2 text-xs'>
           <span className='font-medium'>{filename || ''}</span>
           {language && <span className='opacity-80'>{language}</span>}
         </div>

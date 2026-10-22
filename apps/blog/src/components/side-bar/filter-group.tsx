@@ -16,7 +16,7 @@ export const FilterGroup = ({
   return (
     <aside className='col-span-full grid grid-cols-subgrid gap-y-4 self-start md:col-span-4'>
       <TableHeader className='col-span-full'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / filters
         </span>
       </TableHeader>
@@ -28,7 +28,7 @@ export const FilterGroup = ({
           </Accordion.Trigger>
           <Accordion.Content>
             <div className='mt-2 ml-2.5 flex flex-col'>
-              <ul className='no-scrollbar md:border-border/50 flex gap-x-2 overflow-x-auto md:flex-col md:gap-y-1 md:border-l md:border-dotted md:pl-3.5'>
+              <ul className='no-scrollbar md:border-border-subtle flex gap-x-2 overflow-x-auto md:flex-col md:gap-y-1 md:border-l md:border-dotted md:pl-3.5'>
                 {Object.entries(filterItems).map(([tag, count]) => (
                   <li key={tag} className='whitespace-nowrap'>
                     <FilterItem
