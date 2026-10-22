@@ -2,6 +2,7 @@ import type { MDXComponents as MDXComponentsType } from 'mdx/types';
 import { CodeBlock } from './code-block';
 import { Callout } from './callout';
 import { FootnoteTooltip } from './footnote-tooltip';
+import { cn } from '@/lib/utils';
 
 /**
  * 텍스트 - 16px / 333d4b
@@ -238,20 +239,28 @@ export const MDXComponents: MDXComponentsType = {
       <span className='ml-0.5 text-[0.75rem] font-medium'>{children}</span>
     </sup>
   ),
-  section: ({ children, ...props }) => {
+  section: ({ children, className, ...props }) => {
     // data-footnotes 속성이 있는 경우만 각주 컨테이너로 스타일링
+    // rehype가 넘기는 className('footnotes')과 병합해야 스타일이 덮어써지지 않는다
     if ('data-footnotes' in props) {
       return (
         <section
-          className='border-border-subtle my-10 border-t-[1.5px] pt-6'
           {...props}
+          className={cn(
+            'border-border-subtle my-10 border-t-[1.5px] pt-6',
+            className
+          )}
         >
           {children}
         </section>
       );
     }
     // 일반 section인 경우
-    return <section {...props}>{children}</section>;
+    return (
+      <section className={className} {...props}>
+        {children}
+      </section>
+    );
   },
   strong: ({ children, ...props }) => (
     <strong className='text-foreground font-bold' {...props}>
