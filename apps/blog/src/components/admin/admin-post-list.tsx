@@ -15,16 +15,16 @@ export function AdminPostList() {
   return (
     <div className='col-span-full grid grid-cols-subgrid self-start md:col-start-6 md:row-span-2 md:row-start-2'>
       <TableHeader className='col-span-full text-xs'>
-        <span className='text-primary col-span-2 col-start-1 font-semibold uppercase sm:col-span-3'>
+        <span className='text-foreground col-span-2 col-start-1 font-semibold uppercase sm:col-span-3'>
           / Date
         </span>
-        <span className='text-primary col-span-4 col-start-3 font-semibold uppercase sm:col-span-8 sm:col-start-4 md:col-span-10'>
+        <span className='text-foreground col-span-4 col-start-3 font-semibold uppercase sm:col-span-8 sm:col-start-4 md:col-span-10'>
           / Title
         </span>
-        <span className='text-primary col-span-2 col-start-7 font-semibold uppercase sm:col-span-2 sm:col-start-12 md:col-span-3 md:col-start-14'>
+        <span className='text-foreground col-span-2 col-start-7 font-semibold uppercase sm:col-span-2 sm:col-start-12 md:col-span-3 md:col-start-14'>
           / Status
         </span>
-        <span className='text-primary hidden font-semibold uppercase sm:col-span-3 sm:col-start-14 sm:block md:col-span-4 md:col-start-17'>
+        <span className='text-foreground hidden font-semibold uppercase sm:col-span-3 sm:col-start-14 sm:block md:col-span-4 md:col-start-17'>
           / Visibility
         </span>
       </TableHeader>
@@ -42,7 +42,7 @@ export function AdminPostList() {
             />
           ))
         ) : (
-          <li className='border-border/50 text-primary/60 col-span-full border-b-[0.5px] px-1 py-8 text-sm font-semibold uppercase'>
+          <li className='border-border-subtle text-muted-foreground col-span-full border-b-[0.5px] px-1 py-8 text-sm font-semibold uppercase'>
             No posts in this view.
           </li>
         )}
@@ -67,7 +67,7 @@ function AdminPostRow({
   const actionLabel = post.published ? 'HIDE' : 'SHOW';
 
   return (
-    <li className='border-border/50 text-primary isolate col-span-full grid grid-cols-subgrid items-center border-b-[0.5px] px-1 py-2.5'>
+    <li className='border-border-subtle text-foreground isolate col-span-full grid grid-cols-subgrid items-center border-b-[0.5px] px-1 py-2.5'>
       <span className='col-span-2 col-start-1 text-[13px] font-semibold sm:col-span-3'>
         {post.date}
       </span>
@@ -84,7 +84,7 @@ function AdminPostRow({
           <span className='text-md truncate font-bold'>{post.title}</span>
         )}
         {post.description ? (
-          <p className='text-primary/80 line-clamp-1 text-[14px]'>
+          <p className='text-foreground-secondary line-clamp-1 text-[14px]'>
             {post.description}
           </p>
         ) : null}

@@ -35,10 +35,10 @@ export const AdminDashboard = ({ children }: AdminDashboardProps) => {
             aria-selected={selectedTab === tab.value}
             aria-current={selectedTab === tab.value ? 'page' : undefined}
             className={cn(
-              'border-border/40 text-primary min-w-28 border px-2 py-1.5 text-left text-xs font-semibold tracking-tight transition-colors',
+              'border-border-subtle text-foreground min-w-28 border px-2 py-1.5 text-left text-xs font-semibold tracking-tight transition-colors',
               selectedTab === tab.value
                 ? 'bg-foreground text-background'
-                : 'hover:bg-accent/50 bg-transparent'
+                : 'hover:bg-wash bg-transparent'
             )}
           >
             {tab.label}

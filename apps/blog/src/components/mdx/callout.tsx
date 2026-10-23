@@ -1,49 +1,75 @@
 import React from 'react';
 
+import { cn } from '@/lib/utils';
+
+type CalloutType = 'info' | 'warning' | 'error' | 'success';
+
 interface CalloutProps {
   children: React.ReactNode;
-  type?: 'info' | 'warning' | 'error' | 'success';
+  type?: CalloutType;
   title?: string;
 }
 
+const CALLOUT_STYLES: Record<
+  CalloutType,
+  { box: string; key: string; mark: string; label: string }
+> = {
+  info: {
+    box: 'bg-callout-info-bg border-callout-info-border',
+    key: 'text-callout-info-icon',
+    mark: 'i',
+    label: 'Note',
+  },
+  success: {
+    box: 'bg-callout-success-bg border-callout-success-border',
+    key: 'text-callout-success-icon',
+    mark: '✓',
+    label: 'Tip',
+  },
+  warning: {
+    box: 'bg-callout-warning-bg border-callout-warning-border',
+    key: 'text-callout-warning-icon',
+    mark: '!',
+    label: 'Warning',
+  },
+  error: {
+    box: 'bg-callout-error-bg border-callout-error-border',
+    key: 'text-callout-error-icon',
+    mark: '×',
+    label: 'Caution',
+  },
+};
+
 /**
- * Callout 컴포넌트 - 중요한 정보를 강조
+ * Callout 컴포넌트 - 본문 흐름 안에서 보충 설명·주의 사항을 강조
  */
 export function Callout({ children, type = 'info', title }: CalloutProps) {
-  const styles = {
-    info: 'bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-900',
-    warning:
-      'bg-yellow-50 border-yellow-200 dark:bg-yellow-950/30 dark:border-yellow-900',
-    error: 'bg-red-50 border-red-200 dark:bg-red-950/30 dark:border-red-900',
-    success:
-      'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-900',
-  };
-
-  const iconStyles = {
-    info: 'text-blue-600 dark:text-blue-400',
-    warning: 'text-yellow-600 dark:text-yellow-400',
-    error: 'text-red-600 dark:text-red-400',
-    success: 'text-green-600 dark:text-green-400',
-  };
-
-  const icons = {
-    info: 'ℹ️',
-    warning: '⚠️',
-    error: '❌',
-    success: '✅',
-  };
+  const style = CALLOUT_STYLES[type];
 
   return (
-    <div className={`my-6 rounded-lg border p-4 ${styles[type]}`} role='alert'>
-      <div className='flex items-start gap-3'>
-        <span className={`text-xl ${iconStyles[type]}`}>{icons[type]}</span>
-        <div className='flex-1'>
-          {title && (
-            <h4 className='text-foreground mb-2 font-semibold'>{title}</h4>
-          )}
-          <div className='text-foreground/90 text-sm'>{children}</div>
-        </div>
+    <aside
+      aria-label={title ?? style.label}
+      className={cn('my-8 rounded-none border-[0.5px] border-l-2', style.box)}
+    >
+      <p className='border-border-subtle flex items-baseline gap-2 border-b-[0.5px] px-4 py-2 text-xs tracking-tight uppercase'>
+        <span className={cn('font-medium', style.key)} aria-hidden='true'>
+          [{style.mark}]
+        </span>
+        <span className='text-muted-foreground'>{style.label}</span>
+        {title && (
+          <>
+            <span className='text-muted-foreground' aria-hidden='true'>
+              /
+            </span>
+            <span className='text-foreground text-sm font-semibold tracking-normal normal-case'>
+              {title}
+            </span>
+          </>
+        )}
+      </p>
+      <div className='text-prose-ink px-4 py-3 text-[15px] leading-[1.75] [&_p]:my-0 [&_p+p]:mt-3'>
+        {children}
       </div>
-    </div>
+    </aside>
   );
 }

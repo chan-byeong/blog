@@ -35,7 +35,7 @@ export function PostHeader({
           {title}
         </h1>
         {!isScrollDown && description && (
-          <p className='md:text-md text-muted-foreground leading-relaxed'>
+          <p className='text-muted-foreground text-base leading-relaxed'>
             {description}
           </p>
         )}

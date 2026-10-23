@@ -12,7 +12,7 @@ interface CheckboxProps extends React.ComponentPropsWithRef<
 const Checkbox = ({ className, ...props }: CheckboxProps) => (
   <CheckboxPrimitive.Root
     className={cn(
-      'peer h-3.5 w-3.5 shrink-0 rounded-[3px] border border-zinc-300 transition-all focus-visible:ring-1 focus-visible:ring-zinc-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-zinc-900 dark:border-zinc-700',
+      'peer border-checkbox-border focus-visible:ring-ring data-[state=checked]:border-logo-mark h-3.5 w-3.5 shrink-0 rounded-[3px] border transition-all focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
       className
     )}
     {...props}

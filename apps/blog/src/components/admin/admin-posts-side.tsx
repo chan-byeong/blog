@@ -15,13 +15,12 @@ const FILTERS: Array<{ label: string; value: VisibilityFilter }> = [
 ];
 
 export function AdminPostsSide() {
-  const { counts, selectedFilter, setSelectedFilter, logout } =
-    useAdminPosts();
+  const { counts, selectedFilter, setSelectedFilter, logout } = useAdminPosts();
 
   return (
     <div className='col-span-full grid grid-cols-subgrid gap-y-4 self-start md:col-span-4'>
       <TableHeader className='col-span-full'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / overview
         </span>
       </TableHeader>
@@ -33,7 +32,7 @@ export function AdminPostsSide() {
       </div>
 
       <TableHeader className='col-span-full mt-3'>
-        <span className='text-primary col-span-3 col-start-1 text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-3 col-start-1 text-xs font-semibold uppercase'>
           / filters
         </span>
       </TableHeader>

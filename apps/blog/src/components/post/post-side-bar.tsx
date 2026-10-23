@@ -75,13 +75,13 @@ export const PostSideBar = ({
       </div>
 
       <TableHeader className='col-span-full hidden md:grid'>
-        <span className='text-primary col-span-full text-xs font-semibold uppercase'>
+        <span className='text-foreground col-span-full text-xs font-semibold uppercase'>
           / Side
         </span>
       </TableHeader>
 
       <button
-        className='group hover:bg-accent/30 dark:hover:bg-accent dark:hover:text-secondary data-[state=closed]:text-primary/80 col-span-full my-2 mr-4 inline-flex cursor-pointer items-center gap-x-2 self-start rounded-xs py-1 text-[15px] font-medium transition-colors'
+        className='group hover:bg-wash-sm data-[state=closed]:text-foreground-secondary col-span-full my-2 mr-4 inline-flex cursor-pointer items-center gap-x-2 self-start rounded-xs py-1 text-[15px] font-medium transition-colors'
         onClick={handleToggleToc}
         data-state={isTocVisible ? 'open' : 'closed'}
         aria-expanded={isTocVisible}

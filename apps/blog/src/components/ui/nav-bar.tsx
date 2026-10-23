@@ -38,14 +38,14 @@ export const NavBar = () => {
   }
 
   return (
-    <nav className='bg-background/80 fixed top-0 left-1/2 z-50 flex w-full -translate-x-1/2 items-center justify-between px-2 py-2 backdrop-blur-md md:px-8'>
+    <nav className='bg-nav-bar fixed top-0 left-1/2 z-50 flex w-full -translate-x-1/2 items-center justify-between px-2 py-2 backdrop-blur-md md:px-8'>
       <div className='flex items-center gap-2'>
         {/* 로고 아이콘 -> 아이콘 만들고 수정 필요*/}
         <Link
           href='/'
-          className='mr-2 flex h-6 w-6 items-center justify-center rounded bg-zinc-900 text-white transition-colors hover:bg-zinc-800'
+          className='bg-logo-mark mr-2 flex h-6 w-6 items-center justify-center rounded transition-opacity hover:opacity-90'
         >
-          <div className='h-2.5 w-2.5 -skew-x-12 border-2 border-white' />
+          <div className='border-logo-mark-foreground h-2.5 w-2.5 -skew-x-12 border-2' />
         </Link>
 
         <NavigationMenu.Root>

@@ -47,7 +47,7 @@ export const FilterItem = ({
       <span className='text-muted-foreground group-hover:text-foreground group-data-[state=checked]:text-foreground text-sm tracking-wide transition-colors duration-200'>
         {label}
       </span>
-      <span className='text-muted-foreground/50 group-hover:text-muted-foreground/80 group-data-[state=checked]:text-muted-foreground/80 font-mono text-xs transition-colors duration-200'>
+      <span className='text-foreground-disabled group-hover:text-muted-foreground group-data-[state=checked]:text-muted-foreground font-mono text-xs transition-colors duration-200'>
         {postsCount}
       </span>
     </div>

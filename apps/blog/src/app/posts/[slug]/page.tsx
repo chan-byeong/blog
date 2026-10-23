@@ -70,7 +70,7 @@ async function CachedPostPage({ slug }: { slug: string }) {
         />
       </section>
       <section className='col-span-full mt-8 grid grid-cols-subgrid gap-y-4 md:mt-16'>
-        <div className='bg-background/80 sticky top-10 col-span-full mr-2 grid grid-cols-subgrid self-start backdrop-blur-md md:top-24 md:col-span-6 md:col-start-1'>
+        <div className='bg-nav-bar sticky top-10 col-span-full mr-2 grid grid-cols-subgrid self-start backdrop-blur-md md:top-24 md:col-span-6 md:col-start-1'>
           {/* 목차 (TOC) - 큰 화면에서만 표시 */}
           {tocItems.length > 0 && (
             <PostSideBar
@@ -86,7 +86,7 @@ async function CachedPostPage({ slug }: { slug: string }) {
         <div className='col-span-full mx-4 grid grid-cols-subgrid md:col-span-17 md:col-start-8'>
           <div className='col-span-full grid-cols-subgrid items-start'>
             <TableHeader className='col-span-full'>
-              <span className='text-primary col-span-full text-xs font-semibold uppercase'>
+              <span className='text-foreground col-span-full text-xs font-semibold uppercase'>
                 / Contents
               </span>
             </TableHeader>

@@ -9,9 +9,9 @@ const navButtonVariants = cva(
   {
     variants: {
       active: {
-        true: 'bg-foreground/90 text-background shadow-sm',
+        true: 'bg-foreground text-background shadow-sm',
         false:
-          'bg-zinc-100/80 text-zinc-600 hover:bg-foreground hover:text-background dark:bg-zinc-800/80 dark:text-zinc-400 dark:hover:bg-foreground/90 dark:hover:text-background',
+          'bg-nav-chip text-nav-chip-foreground hover:bg-foreground hover:text-background',
       },
     },
     defaultVariants: {
