@@ -17,7 +17,7 @@ export const PostListItem = ({ post }: PostListItemProps) => {
           {post.date}
         </span>
         <div className='col-span-4 col-start-3 flex flex-col gap-0.5 sm:col-span-10 sm:col-start-4 md:col-span-13'>
-          <span className='text-md font-bold'>{post.title}</span>
+          <span className='text-base font-bold'>{post.title}</span>
           {post.description ? (
             <p className='text-foreground-secondary group-hover:text-paper-ink line-clamp-1 text-[14px]'>
               {post.description}

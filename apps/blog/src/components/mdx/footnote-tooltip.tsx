@@ -52,7 +52,6 @@ export function FootnoteTooltip({
           <Tooltip.Portal>
             <Tooltip.Content
               sideOffset={5}
-              // className='animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-w-xs rounded-sm border border-zinc-200 bg-white p-3 text-sm leading-relaxed break-keep whitespace-normal text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200'
               className='bg-tooltip text-tooltip-foreground max-w-sm rounded-xs px-2 py-0.5 wrap-break-word'
             >
               {text}

@@ -67,7 +67,7 @@ export function Callout({ children, type = 'info', title }: CalloutProps) {
           </>
         )}
       </p>
-      <div className='text-prose-ink px-4 py-3 text-[15px] leading-7 [&_p]:my-0 [&_p+p]:mt-3'>
+      <div className='text-prose-ink px-4 py-3 text-[15px] leading-[1.75] [&_p]:my-0 [&_p+p]:mt-3'>
         {children}
       </div>
     </aside>

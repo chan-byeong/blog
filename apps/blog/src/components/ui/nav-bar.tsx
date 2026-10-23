@@ -43,9 +43,9 @@ export const NavBar = () => {
         {/* 로고 아이콘 -> 아이콘 만들고 수정 필요*/}
         <Link
           href='/'
-          className='bg-logo-mark mr-2 flex h-6 w-6 items-center justify-center rounded text-white transition-opacity hover:opacity-90'
+          className='bg-logo-mark mr-2 flex h-6 w-6 items-center justify-center rounded transition-opacity hover:opacity-90'
         >
-          <div className='h-2.5 w-2.5 -skew-x-12 border-2 border-white' />
+          <div className='border-logo-mark-foreground h-2.5 w-2.5 -skew-x-12 border-2' />
         </Link>
 
         <NavigationMenu.Root>
