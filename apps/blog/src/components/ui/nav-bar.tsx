@@ -25,7 +25,7 @@ const navItems = [
 
 export const NavBar = () => {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -76,11 +76,11 @@ export const NavBar = () => {
 
       <div className='flex items-center gap-1'>
         <NavButton
-          label={theme === 'dark' ? 'LIGHT' : 'DARK'}
-          shortcutKey={theme === 'dark' ? 'L' : 'D'}
+          label={resolvedTheme === 'dark' ? 'LIGHT' : 'DARK'}
+          shortcutKey={resolvedTheme === 'dark' ? 'L' : 'D'}
           active={false}
           onClick={() => {
-            setTheme(theme === 'dark' ? 'light' : 'dark');
+            setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
             userAnalytics.track(EventType.THEME_TOGGLED);
           }}
           aria-label='theme toggle'

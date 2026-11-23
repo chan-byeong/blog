@@ -41,7 +41,7 @@ export function FootnoteTooltip({
         <Tooltip.Trigger asChild>
           <a
             href={href}
-            className='text-foreground hover:text-prose-link-hover transition-colors'
+            className='text-muted-foreground hover:text-prose-link-hover transition-colors'
             {...props}
           >
             [{children}]

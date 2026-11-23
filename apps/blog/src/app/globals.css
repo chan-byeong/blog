@@ -198,9 +198,9 @@
   --accent: oklch(0.95 0.06 35); /* 피치 */
   --accent-thick: oklch(82.094% 0.1067 44.138);
   --accent-foreground: oklch(0.45 0.18 35); /* accent is light in both themes */
-  /* lower alpha than light so foreground stays legible on hover (9.48:1) */
-  --wash-sm: oklch(0.95 0.06 35 / 0.12);
-  --wash: oklch(0.95 0.06 35 / 0.2);
+  /* same alpha as light: paper-texture hover tint was nearly invisible at 0.2 */
+  --wash-sm: oklch(0.95 0.06 35 / 0.3);
+  --wash: oklch(0.95 0.06 35 / 0.5);
   --paper-ink: oklch(0.269 0 0); /* paper texture stays light in dark mode */
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-border: oklch(0.704 0.191 22.216 / 0.4);
